@@ -1,0 +1,8 @@
+<senior,f,it,professor>
+<adult, m, en, professor>
+<junior, m, it, student>
+<senior, m, en, visitor>
+<adult,f,it,professor>
+<*,m,it,professor>
+<*,*, it, visitor>
+<*, *, *, *>

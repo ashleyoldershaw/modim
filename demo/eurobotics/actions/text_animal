@@ -1,0 +1,25 @@
+#Format: <age, gender, language, occupation>:"Text to say"
+#age = [adult | senior | junior]
+#gender = [m | f]
+#language = [en | fr | it | sp]
+#occupation = [student | professor | visitor]
+#write character '*' for default option
+<*,*,*,*>:"What is your favourite animal?"
+----
+BUTTONS
+cat
+<*,*,*,*>: Cats
+dog
+<*,*,*,*>: Dogs
+horse
+<*,*,*,*>: Horses
+dolphin
+<*,*,*,*>: Dolphins
+bird
+<*,*,*,*>: Birds
+bear
+<*,*,*,*>: Bears
+----
+ASRCMD 
+<*,*,*,*>: [LOAD_GRAMMAR] frame_animals
+
