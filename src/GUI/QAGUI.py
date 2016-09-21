@@ -12,6 +12,8 @@ except ImportError:
 import PIL
 from PIL import Image, ImageTk
 
+import tkFileDialog
+
 #import cv2
 import socket
 import threading
@@ -19,13 +21,14 @@ import errno, time
 
 import os
 script_dir = os.path.dirname(__file__)
+working_folder = script_dir
 
 from parse_rules_file import *
 
 profile = parseProfile('<*,*,*,*>') #the default profile
 
-demos_filename = "demos"
-working_folder = []
+#demos_filename = "demos"
+
 
 # Global variables:
 # net_ROS and net_speech : objects of class Network
@@ -143,8 +146,8 @@ class Network:
             #  'ask_needhelp'
             # net_speech object will receive:
             #  'ASR_text'
-            self.recvmsg = self.recvmsg.replace('\x00',"")
-            splitmsg = self.recvmsg.strip(' \n\r').split("_") # Example: returns ['display', 'text', 'welcome']
+            self.recvmsg = self.recvmsg.replace('\x00',"").strip(' \n\r')
+            splitmsg = self.recvmsg.split("_") # Example: returns ['display', 'text', 'welcome']
 
             print "RECEIVED: ", self.recvmsg
             #if (len(splitmsg) > 3 or len(splitmsg) < 2):
@@ -180,7 +183,7 @@ class Network:
                   interactionname = splitmsg[2]
                   rules_filename = "_".join([splitmsg[1], splitmsg[2]])
                   #to correctly load the file if the GUI is not executed from the current dir
-                  rules_filename = os.path.join(working_folder, rules_filename)
+                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
 
                   # eval_personalization_rules(welcome) -> actual_interaction
                   actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
@@ -205,12 +208,12 @@ class Network:
                elif (splitmsg[0] == 'ask'):
                   #This instruction involves displaying a text and showing a GUI with options for the user 
                   print "ASK RECEIVED: ", self.recvmsg
-                  split2 = self.recvmsg.strip(' \n\r').split("_",1)
+                  split2 = self.recvmsg.split("_",1)
                   #interactionname = splitmsg[1]
                   rules_filename = "_".join(["text", split2[1]])
                   print split2
                   print rules_filename
-                  rules_filename = os.path.join(working_folder, rules_filename)
+                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
                   print rules_filename
                   actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
                   if (len(actual_interaction)>0):
@@ -233,7 +236,7 @@ class Network:
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
                   rules_filename = "_".join(["text", splitmsg[1]])
-                  rules_filename = os.path.join(working_folder, rules_filename)
+                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
 
                   #  look for the string to say according to user profile
                   actual_interaction = eval_personalization_rules_actions(rules_filename, profile)
@@ -246,10 +249,10 @@ class Network:
                   # tell the GUI to initialize
                   self.parent.parent.event_generate("<<resetMessage>>", when='tail')
                   
-               elif (splitmsg[0] == 'set' and splitmsg[1] == 'demo' and len(splitmsg) == 3):
+               #elif (splitmsg[0] == 'set' and splitmsg[1] == 'demo' and len(splitmsg) == 3):
                   # tell the GUI to change demo
-                  self.demo_path = splitmsg[2];
-                  self.parent.parent.event_generate("<<changeDemoMessage>>", when='tail')
+                  #self.demo_path = splitmsg[2];
+                  #self.parent.parent.event_generate("<<changeDemoMessage>>", when='tail')
 
                elif (splitmsg[0] == 'set' and splitmsg[1] == 'profile' and len(splitmsg) == 3):
                   # tell the GUI to change demo
@@ -398,57 +401,68 @@ class languageSelectionGUI(object):
       self.toplevel.wait_window()
       return (self.chosen_profile, self.button)
 
+
 class demoSelectionGUI(object):
 
-   def __init__(self, parent):
-      self.toplevel = tk.Toplevel(parent)
-      self.frame = tk.Frame(self.toplevel)
-      self.chosen_demo = ''
-      self.selected_env = ''
-      full_demos_filename = os.path.join(script_dir, demos_filename)
+   def __init__(self,parent):
+      global working_folder
+      
+      working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+      if len(working_folder) > 0:
+         print "You chose %s" % working_folder
 
-      list_of_env = parse_demo_list_file(full_demos_filename)
 
-      if len(list_of_env)>0:
-         #we assume 2 levels of directories + subdirectories
+# class demoSelectionGUI(object):
 
-         def env_callback(text, envid):
-            self.chosen_demo = os.path.join(self.chosen_demo,text)
-            self.selected_env = envid
-            self.frame.destroy()
-            self.frame = tk.Frame(self.toplevel)
+#    def __init__(self, parent):
+#       self.toplevel = tk.Toplevel(parent)
+#       self.frame = tk.Frame(self.toplevel)
+#       self.chosen_demo = ''
+#       self.selected_env = ''
+#       full_demos_filename = os.path.join(script_dir, demos_filename)
 
-            print "after frame destroy"
+#       list_of_env = parse_demo_list_file(full_demos_filename)
 
-            def demo_callback(text):
-               self.chosen_demo = os.path.join(self.chosen_demo,text)
-               print self.chosen_demo
-               self.toplevel.destroy()
+#       if len(list_of_env)>0:
+#          #we assume 2 levels of directories + subdirectories
+
+#          def env_callback(text, envid):
+#             self.chosen_demo = os.path.join(self.chosen_demo,text)
+#             self.selected_env = envid
+#             self.frame.destroy()
+#             self.frame = tk.Frame(self.toplevel)
+
+#             print "after frame destroy"
+
+#             def demo_callback(text):
+#                self.chosen_demo = os.path.join(self.chosen_demo,text)
+#                print self.chosen_demo
+#                self.toplevel.destroy()
                
-            #selection of the demo. E.g. personalizeassistance, advertisement...
-            demoid=0
-            sizegrid = 2
-            print len(list_of_env[self.selected_env])
-            for demo in list_of_env[self.selected_env][1]:
-               print demo
-               line = demo
-               btn = tk.Button(self.frame, text=demo, font=("Helvetica", buttonfontsize), command=lambda line=line: demo_callback(line)).grid(row=demoid/sizegrid, column=demoid%sizegrid, sticky='EWNS')
-               demoid +=1
-            self.frame.pack()
+#             #selection of the demo. E.g. personalizeassistance, advertisement...
+#             demoid=0
+#             sizegrid = 2
+#             print len(list_of_env[self.selected_env])
+#             for demo in list_of_env[self.selected_env][1]:
+#                print demo
+#                line = demo
+#                btn = tk.Button(self.frame, text=demo, font=("Helvetica", buttonfontsize), command=lambda line=line: demo_callback(line)).grid(row=demoid/sizegrid, column=demoid%sizegrid, sticky='EWNS')
+#                demoid +=1
+#             self.frame.pack()
 
-         #selection of the environment. E.g. COACHES/DIAG
-         envid=0
-         sizegrid = 2
-         for env in list_of_env:
-            line = env[0]
-            btn = tk.Button(self.frame, text=line, font=("Helvetica", buttonfontsize), command=lambda line=line, envid=envid: env_callback(line, envid)).grid(row=envid/sizegrid, column=envid%sizegrid, sticky='EWNS')
-            envid +=1
-         self.frame.pack()
+#          #selection of the environment. E.g. COACHES/DIAG
+#          envid=0
+#          sizegrid = 2
+#          for env in list_of_env:
+#             line = env[0]
+#             btn = tk.Button(self.frame, text=line, font=("Helvetica", buttonfontsize), command=lambda line=line, envid=envid: env_callback(line, envid)).grid(row=envid/sizegrid, column=envid%sizegrid, sticky='EWNS')
+#             envid +=1
+#          self.frame.pack()
 
-   def show(self):
-      self.toplevel.deiconify()
-      self.toplevel.wait_window()
-      return self.chosen_demo
+#    def show(self):
+#       self.toplevel.deiconify()
+#       self.toplevel.wait_window()
+#       return self.chosen_demo
 
 
 def resize(w, h, w_box, h_box, pil_image, use_antialiasing):
@@ -504,24 +518,26 @@ class GUI(tk.Frame):
       self.parent.bind("<<NewButtonsMessage>>", self.displayButtons)
       self.parent.bind("<<clearButtonsMessage>>", self.clearButtons)  
       self.parent.bind("<<resetMessage>>", self.resetGUICallback)
-      self.parent.bind("<<changeDemoMessage>>", self.changeDemo)
+      #self.parent.bind("<<changeDemoMessage>>", self.changeDemo)
       self.parent.bind("<p>", self.profileSelection)
       self.parent.bind("<l>", self.languageSelection)
+      self.parent.bind("<Button-3>", self.popup)
 
       self.pack(expand=100)
       
       self.buttonsList = []  
       
-      demopath = demoSelectionGUI(self).show()
-      self.initDemo(demopath)
+      #demopath = demoSelectionGUI(self).show()
+      demoSelectionGUI(self)
+      self.initDemo()
 
       self.initUI()
 
 
-   def initDemo(self, demopath):
-      global working_folder
-      working_folder = os.path.join(script_dir, demopath)
-      print demopath
+   def initDemo(self):
+      #global working_folder
+      #working_folder = os.path.join(script_dir, demopath)
+      #print demopath
       print "working folder: ", working_folder
 
       init_filename = os.path.join(working_folder, "init")
@@ -571,8 +587,6 @@ class GUI(tk.Frame):
       # Video
       width = topframe_w  # 800, 500
       height = topframe_h
-      
-      
       if (False):
          #rel_path = 'videos/rives_delorne.mp4'
          rel_path = 'videos/diag.mp4'
@@ -658,6 +672,18 @@ class GUI(tk.Frame):
 
       # BOTTOM FRAME
       # Buttons will be shown only if a question of yes|no is received
+
+      # MENU RIGHT-CLICK BUTTON
+      self.aMenu = tk.Menu(self.parent, tearoff=0)
+      self.aMenu.add_command(label="Load demo", command=self.loadDemo)
+      
+   def loadDemo(self):
+      demoSelectionGUI(self)
+      self.initDemo()
+      self.resetGUI()
+      
+   def popup(self, event):
+      self.aMenu.post(event.x_root, event.y_root)
 
    def setSizeTextLabel(self):
       defaultsize = max_label_font_size
@@ -816,16 +842,16 @@ class GUI(tk.Frame):
       #for button in self.buttonsList:
       #   button.config(height=max_reqheight/10) #so all buttons are of the same height
 
-   def changeDemo(self, event):
-      print 'Event triggered. changeDemo'
+#   def changeDemo(self, event):
+#      print 'Event triggered. changeDemo'
 
-      pathdemo = net_ROS.getDemoPath()
-      self.initDemo(pathdemo)
-      self.resetGUI()
+#      pathdemo = net_ROS.getDemoPath()
+#      self.initDemo(pathdemo)
+#      self.resetGUI()
 
 
    def resetGUI(self):
-      print 'Event triggered. resetGUI'
+      print 'resetGUI'
       self.question.set(self.config['WELCOMEMSG'])
       
       if (self.config.get('GRAMMAR') != None):
