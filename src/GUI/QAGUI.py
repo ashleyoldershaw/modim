@@ -193,10 +193,8 @@ class Network:
                      # if (text) : show actual_interaction as a label in the GUI
                      if (mode == 'text'):
                         list_of_texts = actual_interaction.split("|")
-                        print len(list_of_texts), list_of_texts
                         self.text_to_display = list_of_texts[0]
                         self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
-                        
                         self.sayMessage(list_of_texts)
                                                 
                      # if (image) : show image in actual_interaction as an image in the GUI
@@ -218,9 +216,9 @@ class Network:
                   actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
                   if (len(actual_interaction)>0):
                      list_of_texts = actual_interaction.split("|")
-                     print len(list_of_texts), list_of_texts
                      self.text_to_display = list_of_texts[0]
                      self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
+                     self.sayMessage(list_of_texts) 
 
                      self.buttons_to_display = eval_personalization_rules_buttons(rules_filename, profile)
                      buttonsTriggered = False
@@ -231,7 +229,7 @@ class Network:
                      if len(grammar_command) > 0:
                         net_speech.sendMessage(grammar_command+"\n")
 
-                     self.sayMessage(list_of_texts)                        
+                       
 
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
@@ -267,7 +265,7 @@ class Network:
 
    def sayMessage(self, list_of_texts):
       global TTSfree
-      #splitprofile = parseProfile(profile)
+
       text_say = []
       if (len(list_of_texts)>1):
          text_say = list_of_texts[1]
@@ -279,9 +277,6 @@ class Network:
 
       print "[SAY] "+text_say+"|"+profile[2]
       net_speech.sendMessage("[SAY] "+text_say+"|"+profile[2])
-
-      #print "[SAY] "+text_say+"|"+splitprofile[2]
-      #net_speech.sendMessage("[SAY] "+text_say+"|"+splitprofile[2])
 
    def getNewMessage(self):
       return self.recvmsg
