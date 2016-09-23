@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<grammar mode="voice" root="main" tag-format="semantics/1.0" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" xml:lang="es-ES">
+  <rule id="main" scope="public">
+    <item>
+      <ruleref uri="#animals"/>
+      <tag>out = "[animals,[impVp,[" + rules.animals + "]]]"</tag>
+    </item>
+  </rule>
+  <rule id="animals" scope="public">
+    <one-of>
+      <item>gatos<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[cat,0.5]]]"</tag></item>
+      <item>gato<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[cat,0.5]]]"</tag></item>
+      <item>perros<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[dog,0.5]]]"</tag></item>
+      <item>perro<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[dog,0.5]]]"</tag></item>
+      <item>caballos<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[horse,0.5]]]"</tag></item>
+      <item>caballo<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[horse,0.5]]]"</tag></item>
+      <item>delfines<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[dolphin,0.5]]]"</tag></item>
+      <item>delfin<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[dolphin,0.5]]]"</tag></item>
+      <item>pajaros<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[bird,0.5]]]"</tag></item>
+      <item>pajaro<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[bird,0.5]]]"</tag></item>
+      <item>osos<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[bear,0.5]]]"</tag></item>
+      <item>oso<tag>out="[target,[vb,[none,0.5]]],[answer,[nn,[bear,0.5]]]"</tag></item>
+    </one-of>
+  </rule>
+</grammar>

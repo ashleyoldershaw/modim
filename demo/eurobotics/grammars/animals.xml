@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<frame name="animals">
+  <elements>
+    <fe arg="1" name="answer" type="core"/>
+  </elements>
+  <command>
+    <signature>ANIMALS</signature>
+  </command>
+</frame>

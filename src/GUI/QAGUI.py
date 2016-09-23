@@ -40,8 +40,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-ROS_SERVER_TCP_IP = '127.0.0.1'
-#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
+#ROS_SERVER_TCP_IP = '127.0.0.1'
+ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 ROS_SERVER_TCP_PORT = 9000
 
@@ -399,9 +399,8 @@ class languageSelectionGUI(object):
 
 class demoSelectionGUI(object):
 
-   def __init__(self,parent):
+   def __init__(self, parent):
       global working_folder
-      
       working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
       if len(working_folder) > 0:
          print "You chose %s" % working_folder
@@ -523,7 +522,7 @@ class GUI(tk.Frame):
       self.buttonsList = []  
       
       #demopath = demoSelectionGUI(self).show()
-      demoSelectionGUI(self)
+      demoSelectionGUI(self.parent)
       self.initDemo()
 
       self.initUI()

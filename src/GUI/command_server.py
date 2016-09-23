@@ -287,7 +287,7 @@ def ros_connection():
     print >>sys.stderr, 'starting up on %s port %s \n' % sock_ros.getsockname()
     sock_ros.listen(1)
 
-    while(not speech_thread_stop.is_set()):
+    while(not ros_thread_stop.is_set()):
 
         try:
         
@@ -306,7 +306,7 @@ def ros_connection():
         try:
             print >> sys.stderr, 'client connected:', ros_client_address
             BUFFER_SIZE = 1024
-            while(not speech_thread_stop.is_set()):
+            while(not ros_thread_stop.is_set()):
                 data = ros_connection.recv(BUFFER_SIZE)
                 if data:
                     print >>sys.stderr, 'received "%s" \n' % data 

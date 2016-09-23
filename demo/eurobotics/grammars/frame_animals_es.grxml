@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<grammar mode="voice" root="main" tag-format="semantics/1.0" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" xml:lang="es-ES">
+  <rule id="main" scope="public">
+    <one-of>
+      <item>
+        <ruleref uri="#commands"/>
+        <tag>out = "[s," + rules.commands + "]";</tag>
+      </item>
+    </one-of>
+  </rule>
+  <rule id="commands" scope="public">
+    <ruleref uri="#preamble"/>
+    <one-of>
+      <item>
+        <ruleref uri="animals_es.grxml#main"/>
+      </item>
+    </one-of>
+    <ruleref uri="#preamble"/>
+    <tag>out = rules.main;</tag>
+  </rule>
+  <rule id="preamble" scope="public">
+    <ruleref special="GARBAGE"/>
+  </rule>
+</grammar>
