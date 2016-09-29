@@ -40,8 +40,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-#ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
+ROS_SERVER_TCP_IP = '127.0.0.1'
+#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 ROS_SERVER_TCP_PORT = 9000
 
@@ -64,7 +64,7 @@ topframe_h = 300
 buttonfontsize = 16
 hbutton = 150
 max_label_font_size = 40
-max_label_height = 300
+max_label_height = 280
 langbutton_size = 60
 
 TTSfree = True
@@ -817,11 +817,15 @@ class GUI(tk.Frame):
             w, h = imgbutton.size            
             #imgbutton_resized = self.setHeight(w, h, hbutton, imgbutton, True)
             button_width = (screen_width-80)/sizegrid
-            imgbutton_resized = setWidth(w, h, button_width, imgbutton, True)
+            imgbutton_resized = resize(w, h, button_width, hbutton, imgbutton, True)
             phbutton = ImageTk.PhotoImage(imgbutton_resized)
             btn = tk.Button(self.bottomframe, image=phbutton, command=lambda command=command: self.buttonsCallback(command))
             btn.image = phbutton
-            btn.grid(row=buttonid/sizegrid, column=buttonid%sizegrid, sticky='EWNS')
+            column= buttonid%sizegrid
+            btn.grid(row=buttonid/sizegrid, column=column,  sticky=W+E)
+            btn.configure(background='white', activebackground='white')
+            self.bottomframe.grid_columnconfigure(column, weight=1)
+      
             buttonid +=1
          else:
             btn = tk.Button(self.bottomframe, text=display, font=("Helvetica", buttonfontsize), wraplength=screen_width/len(self.buttonsToDisplay), command=lambda command=command: self.buttonsCallback(command))
