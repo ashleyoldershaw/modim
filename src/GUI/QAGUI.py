@@ -40,8 +40,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-#ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
+ROS_SERVER_TCP_IP = '127.0.0.1'
+#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 ROS_SERVER_TCP_PORT = 9000
 
@@ -81,7 +81,7 @@ class Network:
       self.buttons_to_display = ''
       self.netStatusOk = False
       self.thread_stop= threading.Event()
-      self.initNetwork()
+      #self.initNetwork() # It will try to connect in the veirfyNetwork thread
       self.netStatusThread = threading.Thread(target=self.verifyNetwork)
       self.netStatusThread.start()
       self.parent = ''
@@ -111,6 +111,11 @@ class Network:
             self.recvThread = threading.Thread(target=self.receiveMessage)
             self.recvThread.start()
             self.netStatusOk = True
+            if (self.serverPort == SPEECH_SERVER_TCP_PORT):
+               # Initialization for Speech
+               self.sendMessage("[CONNECT]PythonTestClient\n")
+               time.sleep(0.2)
+               self.sendMessage("[INIT]\n")
             break
          except socket.error as e:
             print '[error]', e , self.serverTcpIP, ':', self.serverPort
@@ -119,6 +124,7 @@ class Network:
                secsToSleep = 5
                print "trying to reconnect in %d seconds" % (secsToSleep)
                time.sleep(secsToSleep)
+         
 
    def receiveMessage(self):
       #generates events to update the GUI based on the received messages
@@ -876,13 +882,10 @@ class GUI(tk.Frame):
       net_speech.closeConnection()
       pass
 
-
-
+# global variables used in Tk
 net_speech = Network(SPEECH_SERVER_TCP_IP, SPEECH_SERVER_TCP_PORT)
 net_ROS = Network(ROS_SERVER_TCP_IP, ROS_SERVER_TCP_PORT)
-net_speech.sendMessage("[CONNECT]PythonTestClient\n")
-time.sleep(0.2)
-net_speech.sendMessage("[INIT]\n")
+
 def main():
    root = tk.Tk()
    f = GUI(root)

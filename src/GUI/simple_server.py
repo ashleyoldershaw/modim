@@ -7,7 +7,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the address given on the command line
 server_address = ('127.0.0.1', 9000)
 sock.bind(server_address)
-print >>sys.stderr, 'starting up on %s port %s' % sock.getsockname()
+print >>sys.stderr, 'starting up ROS server on %s port %s' % sock.getsockname()
 sock.listen(1)
 
 while True:

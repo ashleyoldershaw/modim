@@ -6,6 +6,15 @@ import tkFileDialog
 import threading 
 #from Tkinter import *
 
+
+# Global variables:
+# net_ROS and net_speech : objects of class Network
+SPEECH_SERVER_TCP_IP = '127.0.0.1'
+SPEECH_SERVER_TCP_PORT = 1800
+ROS_SERVER_TCP_IP = '127.0.0.1'
+ROS_SERVER_TCP_PORT = 9001
+
+
 class App(tk.Tk):
 
     def __init__(self, master):
@@ -27,9 +36,9 @@ class App(tk.Tk):
         options['title'] = 'This is a title'
 
         
-        tk.Label(master, text="Ros_tcp_server").grid(row=0, sticky=tk.W)
+        tk.Label(master, text="ROS TCP server").grid(row=0, sticky=tk.W)
         tk.Label(master, textvariable=ceck_connection_ros).grid(row=0,column=2)
-        tk.Label(master, text="Speech_tcp_server").grid(row=1, sticky=tk.W)
+        tk.Label(master, text="Speech TCP server").grid(row=1, sticky=tk.W)
         tk.Label(master, textvariable=ceck_connection_speech).grid(row=1,column=2)
 
         self.e1 = tk.Entry(master)
@@ -53,13 +62,13 @@ class App(tk.Tk):
         self.button2.grid(row=1, column=2, sticky=tk.W)
 
         
-        tk.Label(master, text="Message to RosServer").grid(row=2, sticky=tk.W)
+        tk.Label(master, text="Message to GUI from ROS Server").grid(row=2, sticky=tk.W)
         self.e5 = tk.Entry(master, width=55)
         self.e5.grid(row=2, column=1, columnspan=2, sticky=tk.W)
         self.button3 = tk.Button(master, text="Send", command=self.send_message_ros)
         self.button3.grid(row=2, column=2)
         
-        tk.Label(master, text="Message to SpeechServer").grid(row=3, sticky=tk.W)
+        tk.Label(master, text="Message to GUI from SpeechServer").grid(row=3, sticky=tk.W)
         self.e6 = tk.Entry(master, width=55)  
         self.e6.grid(row=3, column=1, columnspan=2, sticky=tk.W)
         self.button4 = tk.Button(master, text="Send", command=self.send_message_speech)
@@ -284,14 +293,15 @@ def ros_connection():
     #print "Thread ros started 1"
     ros_server_address=(ROS_SERVER_TCP_IP,ROS_SERVER_TCP_PORT)
     sock_ros.bind(ros_server_address)
-    print >>sys.stderr, 'starting up on %s port %s \n' % sock_ros.getsockname()
+    print >>sys.stderr, 'Starting up ROS server on %s port %s \n' % sock_ros.getsockname()
     sock_ros.listen(1)
+
+    print >>sys.stderr, 'ROS server is waiting for a connection \n'
 
     while(not ros_thread_stop.is_set()):
 
         try:
-        
-            print >>sys.stderr, 'Ros server is waiting for a connection \n'
+            #print >>sys.stderr, 'Ros server is waiting for a connection \n'
             ros_connection, ros_client_address = sock_ros.accept()
             ceck_connection_ros.set('Connected')
             flag_connection_ros = True
@@ -300,7 +310,7 @@ def ros_connection():
            continue
         
         except:
-            print 'Ros socket closed'
+            print 'ROS socket closed'
             return
 
         try:
@@ -317,7 +327,7 @@ def ros_connection():
                     ros_connection.close()
                     break
         except:
-            print 'Ros connetion socket closed'
+            print 'ROS connetion socket closed'
             return
     
     
@@ -333,13 +343,14 @@ def speech_connection():
     print "Thread speech started"
     speech_server_address=(SPEECH_SERVER_TCP_IP,SPEECH_SERVER_TCP_PORT)
     sock_speech.bind(speech_server_address)
-    print >>sys.stderr, 'starting up on %s port %s \n' % sock_speech.getsockname()
+    print >>sys.stderr, 'Starting up Speech server on %s port %s \n' % sock_speech.getsockname()
     sock_speech.listen(1)
 
+    print >>sys.stderr, 'Speech server is waiting for a connection \n'
     while(not speech_thread_stop.is_set()):
 
         try:
-            print >>sys.stderr, 'Speech server is waiting for a connection \n'
+            #print >>sys.stderr, 'Speech server is waiting for a connection \n'
             speech_connection, speech_client_address = sock_speech.accept()
             ceck_connection_speech.set('Connected')
             flag_connection_speech = True
@@ -372,12 +383,7 @@ def speech_connection():
              print 'Speech connection socket closed'
              return
 
-# Global variables:
-# net_ROS and net_speech : objects of class Network
-SPEECH_SERVER_TCP_IP = '127.0.0.1'
-SPEECH_SERVER_TCP_PORT = 1800
-ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_PORT = 9000
+
 
 flag_connection_ros = False
 flag_connection_speech = False
