@@ -828,7 +828,7 @@ class GUI(tk.Frame):
             btn = tk.Button(self.bottomframe, image=phbutton, command=lambda command=command: self.buttonsCallback(command))
             btn.image = phbutton
             column= buttonid%sizegrid
-            btn.grid(row=buttonid/sizegrid, column=column,  sticky=W+E)
+            btn.grid(row=buttonid/sizegrid, column=column,  sticky=W+E+N+S)
             btn.configure(background='white', activebackground='white')
             self.bottomframe.grid_columnconfigure(column, weight=1)
       
