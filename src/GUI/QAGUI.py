@@ -556,9 +556,12 @@ class GUI(tk.Frame):
      
    def initUI(self):
       
-      self.profileframe = Frame(self)
-      self.profileframe.configure(background='white')
-      self.profileframe.pack(fill = tk.X)
+      multilang = self.config['MULTILANG']
+      if (multilang == 'YES'):
+         self.profileframe = Frame(self)
+         self.profileframe.configure(background='white')
+         self.profileframe.pack(fill = tk.X)
+
       self.topframe = Frame(self)
       self.topframe.configure(background='white')
       self.topframe.pack(fill = tk.X)
@@ -567,21 +570,20 @@ class GUI(tk.Frame):
       self.middleframe.pack(fill = tk.X)
       self.bottomframe = Frame(self)
       self.bottomframe.configure(background='white')
-      self.bottomframe.pack(fill = tk.X)
+      self.bottomframe.pack(fill = tk.X, expand=True)
 
       # PROFILE FRAME
       # Profile selection button
-      abs_file_path = os.path.join(working_folder, "img/english.png")
-      imgbutton = PIL.Image.open(abs_file_path)
-      w, h = imgbutton.size            
-      imgbutton_resized = setHeight(w, h, langbutton_size, imgbutton, True)
-      phbutton = ImageTk.PhotoImage(imgbutton_resized)
-      self.profilebutton = Button(self.profileframe, image=phbutton, command=self.languageSelection)
-      self.profilebutton.image = phbutton
-      self.profilebutton.configure(background='white')
-      self.profilebutton.pack(side=RIGHT, fill='x')
-      #self.profile_label = Label(self.profileframe)
-      #self.profile_label.pack(side=LEFT, fill='x')
+      if (multilang == 'YES'):
+         abs_file_path = os.path.join(working_folder, "img/english.png")
+         imgbutton = PIL.Image.open(abs_file_path)
+         w, h = imgbutton.size            
+         imgbutton_resized = setHeight(w, h, langbutton_size, imgbutton, True)
+         phbutton = ImageTk.PhotoImage(imgbutton_resized)
+         self.profilebutton = Button(self.profileframe, image=phbutton, command=self.languageSelection)
+         self.profilebutton.image = phbutton
+         self.profilebutton.configure(background='white')
+         self.profilebutton.pack(side=RIGHT, fill='x')
 
       # TOP FRAME
       # Video
@@ -785,6 +787,9 @@ class GUI(tk.Frame):
 
    def clearButtons(self, event):
       print 'Event triggered. clearButtons'
+      for index in range(len(self.buttonsList)):
+         self.bottomframe.grid_columnconfigure(index, weight=0)
+
       for btn in self.buttonsList:
          btn.destroy()
       self.buttonsList = []
@@ -811,6 +816,7 @@ class GUI(tk.Frame):
             sizegrid = maxsizegrid
       else:
          sizegrid = len(self.buttonsToDisplay)
+
       for button in self.buttonsToDisplay:
          print button
          command = button[0]
@@ -827,18 +833,23 @@ class GUI(tk.Frame):
             phbutton = ImageTk.PhotoImage(imgbutton_resized)
             btn = tk.Button(self.bottomframe, image=phbutton, command=lambda command=command: self.buttonsCallback(command))
             btn.image = phbutton
-            column= buttonid%sizegrid
-            btn.grid(row=buttonid/sizegrid, column=column,  sticky=W+E+N+S)
-            btn.configure(background='white', activebackground='white')
-            self.bottomframe.grid_columnconfigure(column, weight=1)
-      
-            buttonid +=1
+            #column= buttonid%sizegrid
+            #btn.grid(row=buttonid/sizegrid, column=column,  sticky=W+E+N+S)
+            #btn.configure(background='white', activebackground='white')
+            #self.bottomframe.grid_columnconfigure(column, weight=1)
+            #buttonid +=1
          else:
             btn = tk.Button(self.bottomframe, text=display, font=("Helvetica", buttonfontsize), wraplength=screen_width/len(self.buttonsToDisplay), command=lambda command=command: self.buttonsCallback(command))
-            btn.configure(background='white', activebackground='white', width=80/len(self.buttonsToDisplay))
-            btn.pack(side=LEFT)
+            #btn.configure(background='white', activebackground='white', width=60/len(self.buttonsToDisplay))
+            #btn.pack(side=LEFT, fill=tk.X)
+
+         column= buttonid%sizegrid
+         btn.grid(row=buttonid/sizegrid, column=column, sticky=N+S+W+E)
+         btn.configure(background='white', activebackground='white')
          self.buttonsList.append(btn)
-         #print btn.winfo_reqheight(), btn.winfo_reqwidth()
+         self.bottomframe.grid_columnconfigure(column, weight=1)
+         buttonid +=1
+
          #if btn.winfo_reqheight() > max_reqheight:
             #max_reqheight = btn.winfo_reqheight()
       
@@ -867,7 +878,8 @@ class GUI(tk.Frame):
          profile = parseProfile(self.config['PROFILE'])
 
       #reset frames
-      self.profileframe.destroy()
+      if (self.config.get('MULTILANG') == 'YES'):
+         self.profileframe.destroy()
       self.topframe.destroy()
       self.middleframe.destroy()
       self.bottomframe.destroy()
