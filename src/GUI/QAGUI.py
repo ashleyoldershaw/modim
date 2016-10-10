@@ -513,7 +513,7 @@ class GUI(tk.Frame):
       net_ROS.setParent(self)
       net_speech.setParent(self)
       
-      self.parent.title("COACHES Q&A")
+      self.parent.title("Q&A GUI")
       self.parent.resizable(width=FALSE, height=FALSE)
       self.parent.bind("<<NewButtonsMessage>>", self.displayButtons)
       self.parent.bind("<<clearButtonsMessage>>", self.clearButtons)  
