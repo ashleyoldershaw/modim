@@ -213,7 +213,6 @@ class Network:
                   #This instruction involves displaying a text and showing a GUI with options for the user 
                   print "ASK RECEIVED: ", self.recvmsg
                   split2 = self.recvmsg.split("_",1)
-                  #interactionname = splitmsg[1]
                   rules_filename = "_".join(["text", split2[1]])
                   print split2
                   print rules_filename
@@ -235,7 +234,38 @@ class Network:
                      if len(grammar_command) > 0:
                         net_speech.sendMessage(grammar_command+"\n")
 
-                       
+               elif (splitmsg[0] == 'askimg'):
+                  #This instruction involves displaying a text and showing a GUI with options for the user 
+                  print "ASK IMG RECEIVED: ", self.recvmsg
+                  split2 = self.recvmsg.split("_",1)
+                  rules_filename = "_".join(["text", split2[1]])
+                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
+                  print rules_filename
+                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
+                  if (len(actual_interaction)>0):
+                     list_of_texts = actual_interaction.split("|")
+                     self.text_to_display = list_of_texts[0]
+                     self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
+                     self.sayMessage(list_of_texts) 
+
+                     self.buttons_to_display = eval_personalization_rules_buttons(rules_filename, profile)
+                     buttonsTriggered = False
+                     #if len(self.buttons_to_display) > 0:
+                     #   self.parent.parent.event_generate("<<NewButtonsMessage>>", when='tail')                  
+                        
+                     grammar_command = eval_personalization_rules_grammar(rules_filename, profile)
+                     if len(grammar_command) > 0:
+                        net_speech.sendMessage(grammar_command+"\n")
+                  rules_filename = "_".join(["image", split2[1]])
+                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
+                  print rules_filename
+                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
+                  print "Display: ", actual_interaction
+                  if (len(actual_interaction)>0):
+                     self.image_to_display = actual_interaction
+                     self.parent.rimg.event_generate("<<NewImgMessage>>", when='tail')
+                     
+                  
 
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
