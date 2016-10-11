@@ -175,19 +175,20 @@ class Network:
                   print "ASR: ", self.recvmsg
                else:
                   print "Ignored ASR: ", self.recvmsg
-            elif (len(splitmsg) > 3 or len(splitmsg) < 2):
-               print "I am:", self.serverTcpIP, ":", self.serverPort
+            #elif (len(splitmsg) > 3 or len(splitmsg) < 2):
+            #   print "I am:", self.serverTcpIP, ":", self.serverPort
                #if (self.parent):
                #   print "Generating event"
                #   self.parent.parent.event_generate("<<clearButtonsMessage>>", when='tail')
-               print 'There is something wrong with the message format. Example: display_[mode]_[interactionname]'
-               continue
+            #   print 'There is something wrong with the message format. Example: display_[mode]_[interactionname]'
+            #   continue
             else:
                print "RECEIVED: ", self.recvmsg
-               if (splitmsg[0] == 'display' and len(splitmsg) == 3):
-                  mode = splitmsg[1]
-                  interactionname = splitmsg[2]
-                  rules_filename = "_".join([splitmsg[1], splitmsg[2]])
+               if (splitmsg[0] == 'display'):
+                  split2 = self.recvmsg.split("_",2)
+                  mode = split2[1]
+                  interactionname = split2[2]
+                  rules_filename = "_".join([mode, interactionname])
                   #to correctly load the file if the GUI is not executed from the current dir
                   rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
 
@@ -441,59 +442,30 @@ class demoSelectionGUI(object):
       if len(working_folder) > 0:
          print "You chose %s" % working_folder
 
+class logInteraction:
 
-# class demoSelectionGUI(object):
+   def findNextNumberSequence(sequence_of_files):
+      nextsequence = 0
+      for f in sequence_of_files:
+         n = int(f.lstrip('logs/'+demoname+'_').rstrip('.log'))
+         if n > nextsequence:
+            nextsequence = n+1
+      return nextsequence
 
-#    def __init__(self, parent):
-#       self.toplevel = tk.Toplevel(parent)
-#       self.frame = tk.Frame(self.toplevel)
-#       self.chosen_demo = ''
-#       self.selected_env = ''
-#       full_demos_filename = os.path.join(script_dir, demos_filename)
+   def createLogFile:
+      global working_folder
+      if not os.path.exists('logs'):
+         os.makedirs('logs')
 
-#       list_of_env = parse_demo_list_file(full_demos_filename)
+      files_in_directory = glob.glob('logs/*.log')
+      demoname = os.path.basename(working_folder)
+      nextsequence = 0
+      if len(files_in_directory) > 0:
+         nextsequence = findNextNumberSequence(files_in_directory)
 
-#       if len(list_of_env)>0:
-#          #we assume 2 levels of directories + subdirectories
-
-#          def env_callback(text, envid):
-#             self.chosen_demo = os.path.join(self.chosen_demo,text)
-#             self.selected_env = envid
-#             self.frame.destroy()
-#             self.frame = tk.Frame(self.toplevel)
-
-#             print "after frame destroy"
-
-#             def demo_callback(text):
-#                self.chosen_demo = os.path.join(self.chosen_demo,text)
-#                print self.chosen_demo
-#                self.toplevel.destroy()
-               
-#             #selection of the demo. E.g. personalizeassistance, advertisement...
-#             demoid=0
-#             sizegrid = 2
-#             print len(list_of_env[self.selected_env])
-#             for demo in list_of_env[self.selected_env][1]:
-#                print demo
-#                line = demo
-#                btn = tk.Button(self.frame, text=demo, font=("Helvetica", buttonfontsize), command=lambda line=line: demo_callback(line)).grid(row=demoid/sizegrid, column=demoid%sizegrid, sticky='EWNS')
-#                demoid +=1
-#             self.frame.pack()
-
-#          #selection of the environment. E.g. COACHES/DIAG
-#          envid=0
-#          sizegrid = 2
-#          for env in list_of_env:
-#             line = env[0]
-#             btn = tk.Button(self.frame, text=line, font=("Helvetica", buttonfontsize), command=lambda line=line, envid=envid: env_callback(line, envid)).grid(row=envid/sizegrid, column=envid%sizegrid, sticky='EWNS')
-#             envid +=1
-#          self.frame.pack()
-
-#    def show(self):
-#       self.toplevel.deiconify()
-#       self.toplevel.wait_window()
-#       return self.chosen_demo
-
+      logfilename = demoname+'_%04d.log'%(nextsequence)
+      
+      return logfilename
 
 def resize(w, h, w_box, h_box, pil_image, use_antialiasing):
    '''
@@ -552,12 +524,12 @@ class GUI(tk.Frame):
       self.parent.bind("<p>", self.profileSelection)
       self.parent.bind("<l>", self.languageSelection)
       self.parent.bind("<Button-3>", self.popup)
+      self.parent.bind("<Button-1>", self.screentouched)
 
       self.pack(expand=100)
       
       self.buttonsList = []  
       
-      #demopath = demoSelectionGUI(self).show()
       demoSelectionGUI(self.parent)
       self.initDemo()
 
@@ -582,6 +554,8 @@ class GUI(tk.Frame):
       global profile
       profile = parseProfile(self.config['PROFILE'])
 
+      logger = logInteraction()
+      logger.createLogFile()
 
      
    def initUI(self):
@@ -716,6 +690,10 @@ class GUI(tk.Frame):
       
    def popup(self, event):
       self.aMenu.post(event.x_root, event.y_root)
+
+   def screentouched(self, event):
+      print "Screen touched"
+      net_ROS.sendMessage("BUTTON touched\n\r")
 
    def setSizeTextLabel(self):
       defaultsize = max_label_font_size
