@@ -662,11 +662,13 @@ class GUI(tk.Frame):
          abs_file_path = os.path.join(working_folder, rel_path)
          img = PIL.Image.open(abs_file_path)
          w, h = img.size
-         if (1.0*w/(width/2.0) > 2.0*h/height):
-             im_resized = setWidth(w, h, width/2, img, True)
-         else:
-             im_resized = setHeight(w, h, height/2, img, True)
+         #if (1.0*w/(width/2.0) > 2.0*h/height):
+         #    im_resized = setWidth(w, h, width/2, img, True)
+         #else:
+         #    im_resized = setHeight(w, h, height/2, img, True)
 
+         #im_resized = setWidth(w, h, width/2, img, True)
+         im_resized = resize(w, h, width, height, img, True)
          imgtk = ImageTk.PhotoImage(image=im_resized)
          self.limg = Label(self.topframe, image=imgtk)
          self.limg.configure(background='white')
@@ -679,10 +681,12 @@ class GUI(tk.Frame):
       img = PIL.Image.open(abs_file_path)
       w, h = img.size
       #im_resized = self.setHeight(w, h, height, img, True)
-      if (1.0*w/(width/2.0) > 1.0*h/height):
-         im_resized = setWidth(w, h, width/2, img, True)
-      else:
-         im_resized = setHeight(w, h, height, img, True) # was height/2
+      #if (1.0*w/(width/2.0) > 1.0*h/height):
+      #   im_resized = setWidth(w, h, width/2, img, True)
+      #else:
+      #   im_resized = setHeight(w, h, height, img, True) # was height/2
+      im_resized = resize(w, h, width, height, img, True)
+      #im_resized = setWidth(w, h, width/2, img, True)
       imgtk = ImageTk.PhotoImage(image=im_resized)
       self.rimg = Label(self.topframe, image=imgtk)
       self.rimg.configure(background='white')
@@ -714,7 +718,7 @@ class GUI(tk.Frame):
 
    def screentouched(self, event):
       print "Screen touched"
-      net_ROS.sendMessage("BUTTON touched\n\r")
+      net_ROS.sendMessage("BUTTON screentouched\n\r")
 
    def setSizeTextLabel(self):
       defaultsize = max_label_font_size
@@ -742,7 +746,8 @@ class GUI(tk.Frame):
       w, h = img.size
       width = topframe_w
       height = topframe_h
-      im_resized = setHeight(w, h, height, img, True)
+      #im_resized = setHeight(w, h, height, img, True)
+      im_resized = resize(w, h, width, height, img, True)
       imgtk = ImageTk.PhotoImage(image=im_resized)
       self.rimg.configure(image = imgtk)
       self.rimg.image = imgtk
