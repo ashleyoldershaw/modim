@@ -21,13 +21,17 @@ import errno, time
 
 import os
 script_dir = os.path.dirname(__file__)
-working_folder = script_dir
+#working_folder = script_dir
+
+working_folder=os.path.dirname('../../../diagdemos/makerfaire/')
 
 import glob
 
 from parse_rules_file import *
 
 profile = parseProfile('<*,*,*,*>') #the default profile
+
+
 
 #demos_filename = "demos"
 
@@ -120,11 +124,11 @@ class Network:
                self.sendMessage("[INIT]\n")
             break
          except socket.error as e:
-            print '[error]', e , self.serverTcpIP, ':', self.serverPort
+            #print '[error]', e , self.serverTcpIP, ':', self.serverPort
             if (e.errno == errno.ECONNREFUSED):
-               print 'not able to connect', self.serverTcpIP, ':', self.serverPort
+               #print 'not able to connect', self.serverTcpIP, ':', self.serverPort
                secsToSleep = 5
-               print "trying to reconnect in %d seconds" % (secsToSleep)
+               #print "trying to reconnect in %d seconds" % (secsToSleep)
                time.sleep(secsToSleep)
          
 
@@ -186,7 +190,17 @@ class Network:
             #   continue
             else:
                print "RECEIVED: ", self.recvmsg
-               if (splitmsg[0] == 'display'):
+               
+               if (splitmsg[0] == 'display' and splitmsg[1] == 'init'):
+                  # tell the GUI to initialize
+                  self.parent.parent.event_generate("<<resetMessage>>", when='tail')
+                  
+               #elif (splitmsg[0] == 'set' and splitmsg[1] == 'demo' and len(splitmsg) == 3):
+                  # tell the GUI to change demo
+                  #self.demo_path = splitmsg[2];
+                  #self.parent.parent.event_generate("<<changeDemoMessage>>", when='tail')
+
+               elif (splitmsg[0] == 'display'):
                   split2 = self.recvmsg.split("_",2)
                   mode = split2[1]
                   interactionname = split2[2]
@@ -282,15 +296,7 @@ class Network:
                      print len(list_of_texts), list_of_texts
                      self.sayMessage(list_of_texts)
 
-               elif (splitmsg[0] == 'display' and splitmsg[1] == 'init'):
-                  # tell the GUI to initialize
-                  self.parent.parent.event_generate("<<resetMessage>>", when='tail')
-                  
-               #elif (splitmsg[0] == 'set' and splitmsg[1] == 'demo' and len(splitmsg) == 3):
-                  # tell the GUI to change demo
-                  #self.demo_path = splitmsg[2];
-                  #self.parent.parent.event_generate("<<changeDemoMessage>>", when='tail')
-
+               
                elif (splitmsg[0] == 'set' and splitmsg[1] == 'profile' and len(splitmsg) == 3):
                   # tell the GUI to change demo
                   profile = splitmsg[2];
@@ -440,9 +446,10 @@ class demoSelectionGUI(object):
 
    def __init__(self, parent):
       global working_folder
-      working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
-      if len(working_folder) > 0:
-         print "You chose %s" % working_folder
+      if working_folder=='':
+        working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+        if len(working_folder) > 0:
+            print "You chose %s" % working_folder
 
 
 
