@@ -75,6 +75,47 @@ langbutton_size = 60
 
 TTSfree = True
 buttonsTriggered = True
+
+
+class logInteraction:
+   def createLogFile(self):
+      global working_folder
+      if not os.path.exists(working_folder+'/logs'):
+         print "Creating log folder in"+ working_folder+ '/logs'
+         os.makedirs(working_folder+'/logs')
+      else:
+         print "Log folder already exists in"+ working_folder+ '/logs'
+         
+      files_in_directory = glob.glob(working_folder+'/logs/*.log')
+      if len(files_in_directory) > 0:
+         for index in range(len(files_in_directory)):
+            files_in_directory[index] = os.path.basename(files_in_directory[index])
+
+      demoname = os.path.basename(working_folder)
+      nextsequence = 0
+      if len(files_in_directory) > 0:
+         nextsequence = self.findNextNumberSequence(files_in_directory,demoname)
+
+      self.logfilename = working_folder+'/logs/'+demoname+'_%04d.log'%(nextsequence)
+      print "Creating log file in: ", self.logfilename
+      self.logfile = open(self.logfilename, 'w')
+      
+
+   def findNextNumberSequence(self,sequence_of_files,demoname):
+      nextsequence = 0
+      for f in sequence_of_files:
+         n = int(f.lstrip(demoname+'_').rstrip('.log'))
+         if n >= nextsequence:
+            nextsequence = n+1
+      return nextsequence
+
+   def log(self, instruction):
+      print 'logging instruction'
+      self.logfile.write(instruction)
+      self.logfile.flush()
+
+logger = logInteraction()
+
 class Network:
    #This class starts the network and launches a thread to receive asynchronous messages
    def __init__(self, serverTcpIP, serverPort):
@@ -189,8 +230,9 @@ class Network:
             #   print 'There is something wrong with the message format. Example: display_[mode]_[interactionname]'
             #   continue
             else:
-               print "RECEIVED: ", self.recvmsg
-               
+               print "RECEIVED from ROS server"
+               logger.log("RECEIVED "+self.recvmsg+"\n")
+
                if (splitmsg[0] == 'display' and splitmsg[1] == 'init'):
                   # tell the GUI to initialize
                   self.parent.parent.event_generate("<<resetMessage>>", when='tail')
@@ -455,46 +497,9 @@ class demoSelectionGUI(object):
 
 
 
-class logInteraction:
-   def createLogFile(self):
-      global working_folder
-      if not os.path.exists(working_folder+'/logs'):
-         print "Creating log folder in"+ working_folder+ '/logs'
-         os.makedirs(working_folder+'/logs')
-      else:
-         print "Log folder already exists in"+ working_folder+ '/logs'
-         
-      files_in_directory = glob.glob(working_folder+'/logs/*.log')
-      print files_in_directory
-      if len(files_in_directory) > 0:
-         for index in range(len(files_in_directory)):
-            files_in_directory[index] = os.path.basename(files_in_directory[index])
-
-      demoname = os.path.basename(working_folder)
-      nextsequence = 0
-      if len(files_in_directory) > 0:
-         nextsequence = self.findNextNumberSequence(files_in_directory,demoname)
-
-      self.logfilename = working_folder+'/logs/'+demoname+'_%04d.log'%(nextsequence)
-      print "Creating log file in: ", self.logfilename
-      self.logfile = open(self.logfilename, 'w')
-      
-
-   def findNextNumberSequence(self,sequence_of_files,demoname):
-      nextsequence = 0
-      for f in sequence_of_files:
-         n = int(f.lstrip(demoname+'_').rstrip('.log'))
-         if n >= nextsequence:
-            nextsequence = n+1
-      return nextsequence
-
-   def log(self, instruction):
-      print 'logging instruction'
-      self.logfile.write(instruction)
-      self.logfile.flush()
 
 
-logger = logInteraction()
+
       
 
 def resize(w, h, w_box, h_box, pil_image, use_antialiasing):
