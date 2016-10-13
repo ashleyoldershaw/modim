@@ -584,9 +584,8 @@ class GUI(tk.Frame):
       global profile
       profile = parseProfile(self.config['PROFILE'])
 
-      logger.createLogFile()
-      
    def initUI(self):
+      logger.createLogFile()
       
       multilang = self.config['MULTILANG']
       if (multilang == 'YES'):
