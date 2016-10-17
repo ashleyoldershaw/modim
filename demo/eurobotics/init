@@ -2,4 +2,4 @@ WELCOMEMSG: Welcome to DIAG
 LEFTIMG: img/diag_logo.jpg
 RIGHTIMG: img/logo_eurobotics_week.png
 PROFILE: <*,*,*,*>
-
+MULTILANG: NO

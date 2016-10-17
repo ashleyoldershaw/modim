@@ -21,9 +21,9 @@ import errno, time
 
 import os
 script_dir = os.path.dirname(__file__)
-#working_folder = script_dir
+working_folder = script_dir
 
-working_folder=os.path.dirname('../../../diagdemos/makerfaire/')
+#working_folder=os.path.dirname('../../../diagdemos/makerfaire/')
 
 import glob
 
@@ -243,99 +243,67 @@ class Network:
                   #self.parent.parent.event_generate("<<changeDemoMessage>>", when='tail')
 
                elif (splitmsg[0] == 'display'):
-                  split2 = self.recvmsg.split("_",2)
+                  split2 = self.recvmsg.split("_",2) #E.g. for display_text_question_animal_001 returns ['display', 'text', 'question_animal_001']
                   mode = split2[1]
                   interactionname = split2[2]
-                  rules_filename = "_".join([mode, interactionname])
-                  #to correctly load the file if the GUI is not executed from the current dir
-                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
 
-                  # eval_personalization_rules(welcome) -> actual_interaction
-                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
-                  print "Display: ", actual_interaction
+                  if (mode == "txtimg"):
+                     action_filename = self.getActionFilename("text", interactionname)
+                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                     self.display("text", actual_interaction)
+                     action_filename = self.getActionFilename("image", interactionname)
+                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                     self.display("image", actual_interaction)
+                  else:
+                     action_filename = self.getActionFilename(mode, interactionname)
+                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                     self.display(mode, actual_interaction)
 
-                  if (len(actual_interaction)>0):
-                     # if (text) : show actual_interaction as a label in the GUI
-                     if (mode == 'text'):
-                        list_of_texts = actual_interaction.split("|")
-                        self.text_to_display = list_of_texts[0]
-                        self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
-                        self.sayMessage(list_of_texts)
-                                                
-                     # if (image) : show image in actual_interaction as an image in the GUI
-                     if (mode == 'image'):
-                        self.image_to_display = actual_interaction
-                        self.parent.rimg.event_generate("<<NewImgMessage>>", when='tail')
-                     
-                     # if (video) : ...TODO
                elif (splitmsg[0] == 'ask'):
                   #This instruction involves displaying a text and showing a GUI with options for the user 
                   print "ASK RECEIVED: ", self.recvmsg
                   split2 = self.recvmsg.split("_",1)
-                  rules_filename = "_".join(["text", split2[1]])
-                  print split2
-                  print rules_filename
-                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
-                  print rules_filename
-                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
-                  if (len(actual_interaction)>0):
-                     list_of_texts = actual_interaction.split("|")
-                     self.text_to_display = list_of_texts[0]
-                     self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
-                     self.sayMessage(list_of_texts) 
+                  interactionname = split2[1]
+                  action_filename = self.getActionFilename("text", interactionname)
+                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                  self.display("text", actual_interaction)
 
-                     self.buttons_to_display = eval_personalization_rules_buttons(rules_filename, profile)
-                     buttonsTriggered = False
-                     #if len(self.buttons_to_display) > 0:
-                     #   self.parent.parent.event_generate("<<NewButtonsMessage>>", when='tail')                  
-                        
-                     grammar_command = eval_personalization_rules_grammar(rules_filename, profile)
-                     if len(grammar_command) > 0:
-                        net_speech.sendMessage(grammar_command+"\n")
+                  self.buttons_to_display = eval_personalization_rules_buttons(action_filename, profile)
+                  buttonsTriggered = False
+
+                  grammar_command = eval_personalization_rules_grammar(action_filename, profile)
+                  if len(grammar_command) > 0:
+                     net_speech.sendMessage(grammar_command+"\n")
 
                elif (splitmsg[0] == 'askimg'):
-                  #This instruction involves displaying a text and showing a GUI with options for the user 
+                  #This instruction involves displaying a text and image and showing a GUI with options for the user 
                   print "ASK IMG RECEIVED: ", self.recvmsg
                   split2 = self.recvmsg.split("_",1)
-                  rules_filename = "_".join(["text", split2[1]])
-                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
-                  print rules_filename
-                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
-                  if (len(actual_interaction)>0):
-                     list_of_texts = actual_interaction.split("|")
-                     self.text_to_display = list_of_texts[0]
-                     self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
-                     self.sayMessage(list_of_texts) 
+                  interactionname = split2[1]
+                  action_filename = self.getActionFilename("text", interactionname)
+                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                  self.display("text", actual_interaction)
 
-                     self.buttons_to_display = eval_personalization_rules_buttons(rules_filename, profile)
-                     buttonsTriggered = False
-                     #if len(self.buttons_to_display) > 0:
-                     #   self.parent.parent.event_generate("<<NewButtonsMessage>>", when='tail')                  
-                        
-                     grammar_command = eval_personalization_rules_grammar(rules_filename, profile)
-                     if len(grammar_command) > 0:
-                        net_speech.sendMessage(grammar_command+"\n")
-                  rules_filename = "_".join(["image", split2[1]])
-                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
-                  print rules_filename
-                  actual_interaction= eval_personalization_rules_actions(rules_filename, profile)
-                  print "Display: ", actual_interaction
-                  if (len(actual_interaction)>0):
-                     self.image_to_display = actual_interaction
-                     self.parent.rimg.event_generate("<<NewImgMessage>>", when='tail')
-                     
-                  
+                  self.buttons_to_display = eval_personalization_rules_buttons(action_filename, profile)
+                  buttonsTriggered = False
+
+                  grammar_command = eval_personalization_rules_grammar(action_filename, profile)
+                  if len(grammar_command) > 0:
+                     net_speech.sendMessage(grammar_command+"\n")
+
+                  action_filename = self.getActionFilename("image", interactionname)
+                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                  self.display("image", actual_interaction)
 
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
-                  rules_filename = "_".join(["text", splitmsg[1]])
-                  rules_filename = os.path.join(working_folder, "actions/"+rules_filename)
+                  interactionname = splitmsg[1]
+                  action_filename = self.getActionFilename("text", interactionname)
 
                   #  look for the string to say according to user profile
-                  actual_interaction = eval_personalization_rules_actions(rules_filename, profile)
+                  actual_interaction = eval_personalization_rules_actions(action_filename, profile)
                   if (len(actual_interaction)>0):
                      list_of_texts = actual_interaction.split("|")
-                     print len(list_of_texts), list_of_texts
                      self.sayMessage(list_of_texts)
 
                
@@ -349,6 +317,29 @@ class Network:
 
 
       print 'Finished receive thread'
+
+   def getActionFilename(self, mode, interactionname):
+      rules_filename = "_".join([mode, interactionname])
+      #to correctly load the file if the GUI is not executed from the current dir
+      rules_fullfilename = os.path.join(working_folder, "actions/"+rules_filename)
+   
+      return rules_fullfilename
+
+   def display(self, mode, actual_interaction):
+      if (len(actual_interaction)>0):
+         # if (text) : show actual_interaction as a label in the GUI
+         if (mode == 'text'):
+            list_of_texts = actual_interaction.split("|")
+            self.text_to_display = list_of_texts[0]
+            self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
+            self.sayMessage(list_of_texts)
+      
+         # if (image) : show image in actual_interaction as an image in the GUI
+         if (mode == 'image'):
+            self.image_to_display = actual_interaction
+            self.parent.rimg.event_generate("<<NewImgMessage>>", when='tail')
+      
+         # if (video) : ...TODO
 
    def sayMessage(self, list_of_texts):
       global TTSfree
@@ -488,10 +479,10 @@ class demoSelectionGUI(object):
 
    def __init__(self, parent):
       global working_folder
-      if working_folder=='':
-        working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
-        if len(working_folder) > 0:
-            print "You chose %s" % working_folder
+      #if working_folder=='':
+      working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+      if len(working_folder) > 0:
+         print "You chose %s" % working_folder
 
 
 
