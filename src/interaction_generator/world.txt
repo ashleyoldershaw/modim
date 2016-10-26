@@ -1,8 +1,0 @@
-asia = ['Azerbaijan','Bangladesh','China','India','Indonesia','Iran','Iraq','Kazakhstan','Pakistan','Russia','Syria','Turkey','Vietnam']
-america =['Argentina','Bolivia','Brazil','Ecuador','Mexico','Peru','Trinidad_and_Tobago','United_States','Venezuela']
-africa = ['Algeria','Egypt','Ghana','Sudan','Tunisia','Zambia']
-europe = ['Estonia','France','Germany','Greece','Montenegro','Portugal','Spain','United_Kingdom']
-
-cont_es = ['africa','america','asia','europa']
-cont = ['africa','america','asia','europe']
-world = [africa,america,asia,europe]
