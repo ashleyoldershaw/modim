@@ -1,0 +1,3 @@
+head = yes
+question = yes
+button = yes

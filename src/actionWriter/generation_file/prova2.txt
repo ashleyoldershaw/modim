@@ -1,0 +1,10 @@
+head = no
+question = yes
+button = yes
+
+structure={'head':'no','question':'yes','button':'yes'}
+
+
+topic = {'en':'where are you from?', 
+'es':'de que pais eres?',
+'it':'da dove vieni?'}

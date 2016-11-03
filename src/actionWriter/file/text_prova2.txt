@@ -1,0 +1,15 @@
+<*, *, en, *>: where are you from?
+<*, *, it, *>: da dove vieni?
+<*, *, es, *>: de que pais eres?
+----
+BUTTONS
+text_TO_BE_DEFINED
+<*, *, en, *>: where are you from?
+text_TO_BE_DEFINED
+<*, *, it, *>: da dove vieni?
+text_TO_BE_DEFINED
+<*, *, es, *>: de que pais eres?
+----
+ASRCMD
+<*,*,*,*>: [LOAD_GRAMMAR] frame_helps
+----
