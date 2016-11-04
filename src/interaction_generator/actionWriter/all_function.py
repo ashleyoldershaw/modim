@@ -30,11 +30,11 @@ class ActionWriter:
 	#Output: complete buttons section
 
 
-	def writeInstruction(instruction):
-	#E.g. instruction = (profile, text)
+	def writeRule(rule):
+	#E.g. rule = (profile, text)
 	
-	def writeInstructions(instructions):
-	#E.g. instructions = ((profile1, text1), (profile2, text2), ...)
+	def writeRules(rules):
+	#E.g. rules = ((profile1, text1), (profile2, text2), ...)
 	
 	def writeGrammarSection(grammars):
 	#E.g. grammars = ((profile1, grammar1), (profile2, grammar2), ...)
