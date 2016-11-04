@@ -209,7 +209,7 @@ class Network:
                if (self.recvmsg.startswith("[END_SYNTH]")):
                   print 'setting TTSfree true'
                   TTSfree = True
-                  net_ROS.sendMessage("[END_SYNTH]\n")
+                  net_ROS.sendMessage("[END_SYNTH]\n\r")
 
                   #display buttons now that the question finished
                   if not buttonsTriggered and len(net_ROS.buttons_to_display) > 0:
@@ -219,7 +219,7 @@ class Network:
                   #self.textSynthTime = time.time()+1
                #elif (time.time() > self.textSynthTime):
                elif (TTSfree):
-                  net_ROS.sendMessage("ASR "+ self.recvmsg)
+                  net_ROS.sendMessage("ASR "+ self.recvmsg+"\n\r")
                   print "ASR: ", self.recvmsg
                else:
                   print "Ignored ASR: ", self.recvmsg
