@@ -23,7 +23,8 @@ import os
 script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
-#working_folder=os.path.dirname('../../../diagdemos/makerfaire/')
+demo_folder='' # to select the demo with a filedialog box
+#demo_folder=os.path.dirname('../../../diagdemos/rai/') # to start directly with this demo
 
 import glob
 
@@ -479,10 +480,12 @@ class demoSelectionGUI(object):
 
    def __init__(self, parent):
       global working_folder
-      #if working_folder=='':
-      working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+      if demo_folder=='':
+        working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+      else:
+        working_folder = demo_folder    
       if len(working_folder) > 0:
-         print "You chose %s" % working_folder
+         print "Demo selected: %s" % working_folder
 
 
 
