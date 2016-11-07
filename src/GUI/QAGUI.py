@@ -359,9 +359,14 @@ class Network:
       #self.textSynthTime = time.time()+3
       print 'setting TTSfree FALSE'
       TTSfree = False
-
-      print "[SAY] "+text_say+"|"+profile[2]
-      net_speech.sendMessage("[SAY] "+text_say+"|"+profile[2])
+      
+      if (len(text_say)>1):
+        print "[SAY] "+text_say+"|"+profile[2]
+        net_speech.sendMessage("[SAY] "+text_say+"|"+profile[2])
+      else:
+        TTSfree = True
+        net_ROS.sendMessage("[END_SYNTH]\n\r")
+        
 
    def getNewMessage(self):
       return self.recvmsg
