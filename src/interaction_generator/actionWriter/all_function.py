@@ -8,6 +8,43 @@ import re
 
 value_check = ['yes','no']
 
+
+class ActionWriter:
+	def __init__(self, nameOfFile):
+		#open file.
+   		self.actionFile = open...
+
+
+
+	def writeButton(button):
+	#E.g. button = ('topic', buttonInstance1, buttonInstance2, ...)
+	#E.g. buttong = ('green', buttong_en, buttong_es)
+	#Output: green
+  	#        <*,*,*,*>: Green
+	#	 <*,*,es,*>: Verde
+
+		self.actionFile 
+
+	def writeButtonsSection(buttons):
+	#E.g. buttons = (buttong, buttonr, ...)
+	#Output: complete buttons section
+
+
+	def writeRule(rule):
+	#E.g. rule = (profile, text)
+	
+	def writeRules(rules):
+	#E.g. rules = ((profile1, text1), (profile2, text2), ...)
+	
+	def writeGrammarSection(grammars):
+	#E.g. grammars = ((profile1, grammar1), (profile2, grammar2), ...)
+	
+	def writeTextSection(texts):
+	#E.g. texts = ((profile1, text1), (profile2, text2), ...)
+
+	
+
+	
 def actionWriter(path_read,path_write,topic):
     # Definition of the HEAD section
     def head_function(inc):   
