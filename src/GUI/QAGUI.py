@@ -105,7 +105,10 @@ class logInteraction:
    def findNextNumberSequence(self,sequence_of_files,demoname):
       nextsequence = 0
       for f in sequence_of_files:
-         n = int(f.lstrip(demoname+'_').rstrip('.log'))
+         #n = int(f.lstrip(demoname+'_').rstrip('.log')) #Gives problems with numbers in demoname
+         l = f.split('_')
+         lastpart = l[len(l)-1]
+         n = int(lastpart.rstrip('.log'))
          if n >= nextsequence:
             nextsequence = n+1
       return nextsequence
