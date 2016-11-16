@@ -24,7 +24,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 demo_folder='' # to select the demo with a filedialog box
-#demo_folder=os.path.dirname('../../../diagdemos/rai/') # to start directly with this demo
+demo_folder=os.path.dirname('../../../diagdemos/rai/') # to start directly with this demo
 
 import glob
 
@@ -47,9 +47,10 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-ROS_SERVER_TCP_IP = '127.0.0.1'
-#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus
+#ROS_SERVER_TCP_IP = '127.0.0.1'
+ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
+#ROS_SERVER_TCP_IP = '192.168.0.204'
 ROS_SERVER_TCP_PORT = 9000
 
 # Surface tablet
@@ -167,6 +168,8 @@ class Network:
                self.sendMessage("[CONNECT]PythonTestClient\n")
                time.sleep(0.2)
                self.sendMessage("[INIT]\n")
+               #time.sleep(0.2)
+               #self.sendMessage("[BEEP]880|500\n");
             break
          except socket.error as e:
             #print '[error]', e , self.serverTcpIP, ':', self.serverPort
@@ -314,6 +317,9 @@ class Network:
                elif (splitmsg[0] == 'set' and splitmsg[1] == 'profile' and len(splitmsg) == 3):
                   # tell the GUI to change demo
                   profile = splitmsg[2];
+                  
+               elif (splitmsg[0] == 'beep'):
+                  net_speech.sendMessage("[BEEP]880|500\n");
 
                else:
                   print 'Unrecognized instruction'
@@ -356,9 +362,14 @@ class Network:
       #self.textSynthTime = time.time()+3
       print 'setting TTSfree FALSE'
       TTSfree = False
-
-      print "[SAY] "+text_say+"|"+profile[2]
-      net_speech.sendMessage("[SAY] "+text_say+"|"+profile[2])
+      
+      if (len(text_say)>1):
+        print "[SAY] "+text_say+"|"+profile[2]
+        net_speech.sendMessage("[SAY] "+text_say+"|"+profile[2])
+      else:
+        TTSfree = True
+        net_ROS.sendMessage("[END_SYNTH]\n\r")
+        
 
    def getNewMessage(self):
       return self.recvmsg
