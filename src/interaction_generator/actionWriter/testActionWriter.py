@@ -37,14 +37,14 @@ prefix_name = ['text_','img_']
 
 
 for prefix in prefix_name:
-    with open(path_write+prefix+name_file, 'w') as written_file:#TOGLIERE TXT ESTENSIONE
+    with open(path_write+prefix+name_file, 'w') as written_file:
     # Calling/Instantiation of the class 
         writerAct = ActionWriter(written_file,my_action)
         
         if prefix == 'text_':
     
             writerAct.writeTextSection()
-            writerAct.writeButtonsSection() # Chiedere circa le parentesi tonde
+            writerAct.writeButtonsSection()
             #writerAct.writeButton(my_action['BUTTONS'].items())
             writerAct.writeGrammarSection()
 #    
