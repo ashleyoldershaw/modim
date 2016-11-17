@@ -37,7 +37,7 @@ prefix_name = ['text_','img_']
 
 
 for prefix in prefix_name:
-    with open(path_write+prefix+name_file+'.txt', 'w') as written_file:#TOGLIERE TXT ESTENSIONE
+    with open(path_write+prefix+name_file, 'w') as written_file:#TOGLIERE TXT ESTENSIONE
     # Calling/Instantiation of the class 
         writerAct = ActionWriter(written_file,my_action)
         
