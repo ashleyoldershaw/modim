@@ -24,7 +24,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../../diagdemos/rai/') # to start directly with this demo
+demo_folder=os.path.dirname('../../../diagdemos/eurobotics2017/') # to start directly with this demo
 
 import glob
 
@@ -47,8 +47,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-#ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
+ROS_SERVER_TCP_IP = '127.0.0.1'
+#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 #ROS_SERVER_TCP_IP = '192.168.0.204'
 ROS_SERVER_TCP_PORT = 9000
@@ -619,7 +619,9 @@ class GUI(tk.Frame):
       # PROFILE FRAME
       # Profile selection button
       if (multilang == 'YES'):
-         abs_file_path = os.path.join(working_folder, "img/english.png")
+         lang_file = os.path.join(working_folder, "lang_instance")
+         actual_interaction = eval_personalization_rules_actions(lang_file, profile)
+         abs_file_path = os.path.join(working_folder, actual_interaction)
          imgbutton = PIL.Image.open(abs_file_path)
          w, h = imgbutton.size            
          imgbutton_resized = setHeight(w, h, langbutton_size, imgbutton, True)
