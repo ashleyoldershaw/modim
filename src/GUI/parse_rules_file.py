@@ -4,7 +4,7 @@ script_dir = os.path.dirname(__file__)
 
 def parseProfile(str):
     profile = str.strip("\n")
-    profile = profile.lstrip('<').rstrip('>')
+    profile = profile.lstrip('<').rstrip('> ')
     profile = profile.replace(" ","").split(',')
     return profile
 
