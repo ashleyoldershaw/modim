@@ -121,6 +121,25 @@ class logInteraction:
 
 logger = logInteraction()
 
+
+def findSemanticButton(asrmsg):
+   asrword = asrmsg.split("\"")[1]
+   for button in net_ROS.buttons_to_display:
+      topic = button[0]
+      topics = topic.split("|")
+      if len(topics) > 1:
+         if topics[1] == asrword:
+            return topics[0]
+      elif len(topics) <= 1:
+         if topics[0] == asrword:
+            return topics[0]
+         
+      
+   
+
+
+
+
 class Network:
    #This class starts the network and launches a thread to receive asynchronous messages
    def __init__(self, serverTcpIP, serverPort):
@@ -225,7 +244,9 @@ class Network:
                   #self.textSynthTime = time.time()+1
                #elif (time.time() > self.textSynthTime):
                elif (TTSfree):
-                  net_ROS.sendMessage("ASR "+ self.recvmsg+"\n\r")
+                  print net_ROS.buttons_to_display
+                  outtopic = findSemanticButton(self.recvmsg)
+                  net_ROS.sendMessage("ASR "+ outtopic+"\n\r")
                   print "ASR: ", self.recvmsg
                else:
                   print "Ignored ASR: ", self.recvmsg
