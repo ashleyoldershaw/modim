@@ -6,7 +6,7 @@ import os
 
 action = {
 'NAME': 'whichcolor',
-'TEXTS': (('<*,*,es,*>','¿Cuál es tu color preferido?'), ('<*,*,*,*>','What is your favourite color?')),
+'TEXTS': (('<*,*,es,*>: ','¿Cuál es tu color preferido?'), ('<*,*,*,*>: ','What is your favourite color?')),
 'BUTTONS': (('green', ('<*,*,es,*>','Verde'),('<*,*,*,*>','Green')), ('blue', ('<*,*,es,*>','Azul'),('<*,*,*,*>','Blue')), ('red', ('<*,*,es,*>','Rojo'),('<*,*,*,*>','Red')), ('yellow', ('<*,*,es,*>','Amarillo'),('<*,*,*,*>','Yellow')), ('orange', ('<*,*,es,*>','Naranja'),('<*,*,*,*>','Orange')), ('white', ('<*,*,es,*>','Blanco'),('<*,*,*,*>','White')), ('black', ('<*,*,es,*>','Negro'),('<*,*,*,*>','Black'))),
 'GRAMMARS': (('<*,*,es,*>','[LOAD_GRAMMAR] frame_colornames|es'),('<*,*,*,*>','[LOAD_GRAMMAR] frame_colornames')),
 'IMAGES': (('<*,*,es,*>','img/color_es.png'), ('<*,*,*,*>','img/color_en.png'))
@@ -31,34 +31,11 @@ my_action = {
     }
 
 
-path_write = 'file/'
-name_file = my_action['NAME']
-prefix_name = ['text_','img_']
+this_path = 'file/'
+name_file = action['NAME']
 
-
-for prefix in prefix_name:
-    with open(path_write+prefix+name_file, 'w') as written_file:
-    # Calling/Instantiation of the class 
-        writerAct = ActionWriter(written_file,my_action)
-        
-        if prefix == 'text_':
-    
-            writerAct.writeTextSection()
-            writerAct.writeButtonsSection()
-            #writerAct.writeButton(my_action['BUTTONS'].items())
-            writerAct.writeGrammarSection()
-#    
-#     
-#             #writerAct.writeRules()
-            
-        if prefix =='img_':
-            writerAct.writeImageSection()
-            
-        
-            
-    written_file.close()
-
-
+writerAct = ActionWriter(action)
+writerAct.writeAction(this_path)
 
 
 
