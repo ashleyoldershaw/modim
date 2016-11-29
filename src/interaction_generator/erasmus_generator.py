@@ -1,17 +1,6 @@
 import re
 from translate import Translator
 
-#Testing the availability of internet connection
-
-
-# # Old world vocabulary
-# # world = {'africa','america','asia','europe'}
-# # africa ={'af1':'Algeria','af2':'Egypt','af3':'Ghana','af4':'Sudan','af5':'Tunisia','af6':'Zambia'}
-# # america ={'am1':'Argentina','am2':'Bolivia','am3':'Brazil','am4':'Ecuador','am5':'Mexico','am6':'Peru','am7':'Trinidad_and_Tobago','am8':'United_States','am9':'Venezuela'}
-# # asia ={'as1':'Azerbaijan','as2':'Bangladesh','as3':'China','as4':'India','as5':'Indonesia','as6':'Iran','as7':'Iraq','as8':'Kazakhstan','as9':'Pakistan','as10':'Russia','as11':'Syria','as12':'Turkey','as13':'Vietnam'}
-# # europe ={'eu1':'Estonia','eu2':'France','eu3':'Germany','eu4':'Greece','eu5':'Montenegro','eu6':'Portugal','eu7':'Spain','eu8':'United_Kingdom'}
-# #  
-# 
 # #Creation of a vocabulary for world
 world = {'africa':['Algeria','Egypt','Ghana','Sudan','Tunisia','Zambia'],
 'america':['Argentina','Bolivia','Brazil','Ecuador','Mexico','Peru','Trinidad_and_Tobago','United_States','Venezuela'],
@@ -19,7 +8,7 @@ world = {'africa':['Algeria','Egypt','Ghana','Sudan','Tunisia','Zambia'],
 'europe':['Estonia','France','Germany','Greece','Montenegro','Portugal','Spain','United_Kingdom']
 }
 
-#Creation of a function for the translation in italian, french, spanish
+#Function for online translation to italian, french, spanish
 def tradWorld(untraslated):
     line_to_lang = ["en","it","fr","es"]
     d = {}
@@ -27,7 +16,7 @@ def tradWorld(untraslated):
         d[ltl] = Translator(to_lang=ltl).translate(untraslated).encode('utf-8')
     return d
 
-#Function that generate the file text_whichcontinent
+#Function for generating file text_whichcontinent
 def generateContinent(questContinent):
     namefile = 'actions/text_whichcontinent'
     with open(namefile, 'w') as the_file:
@@ -43,7 +32,7 @@ def generateContinent(questContinent):
     #whichcontinent.close()
      
 
-#Function that generate the files text_whichcountry_Continent
+#Function for generating file text_whichcountry_Continent
 def generateCountry(questCountry):
     for continent in world:
         namefile = 'actions/text_whichcountry_'+continent
