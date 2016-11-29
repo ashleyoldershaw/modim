@@ -9,7 +9,7 @@ class ActionWriter():
 		
  	def writeAction(self, actionFile):
   		if 'IMAGES' in self.action.keys():
-  			self.actionFile = open(actionFile+'img_'+self.action['NAME']+'.txt', 'w')
+  			self.actionFile = open(actionFile+'image_'+self.action['NAME'], 'w')
  		 	self.writeImageSection()
  			self.actionFile.close()
 
@@ -17,7 +17,7 @@ class ActionWriter():
 		print 'keys of your action is the '+str(dict_keys)
 		if [item for item in section_key if item in dict_keys]:
 			print 'text_'+str(self.action['NAME'])+' will have these sections'+str([item for item in section_key if item in dict_keys])
-			self.actionFile = open(actionFile+'text_'+self.action['NAME']+'.txt', 'w')
+			self.actionFile = open(actionFile+'text_'+self.action['NAME'], 'w')
 			self.writeTextSection()
 			self.writeButtonsSection()
 			self.writeGrammarSection()
