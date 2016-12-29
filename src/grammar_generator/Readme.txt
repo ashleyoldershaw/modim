@@ -7,8 +7,6 @@ Text file
 A text file encloses all the words, sequence of words or phrases to be recognized by the robot.
 It is the only file to be written or to be modified in order to create, to add or to delete elements from a grammar.
 
-For convenience, all the texts files are located into a folder called "topics".
-
 The name of the text file is exactly the name of the topic of interest plus the language tag for the xml:lang attribute;
 Example:
 topic_en-US".txt
@@ -28,6 +26,6 @@ topic.xml
 topic_languageTag.grxml
 frame_topic_languageTag.grxml
 
-for each topic-text file defined into the folder “topics”, are created in the "grammars" folder.
+for each topic-text file are created.
 
 
