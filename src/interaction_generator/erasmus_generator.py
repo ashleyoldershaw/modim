@@ -58,8 +58,8 @@ for continent in world.values():
         namefile = 'actions/text_'+ co1
         with open(namefile, 'w') as the_file:
             #co1 = re.sub('[_]', ' ', country)
-            sentence1=('I have found this nice image of ') +country.replace('_', ' ') # we can think of randomly read/choose a sentence from a file or a list of sentences
-            for ltl, trad in tradWorld(sentence1.encode('utf-8')).items(): #  ENCODING TO BE VERIFIED
+            sentence1=('I have found this nice image of ') +country.replace('_', ' ')
+            for ltl, trad in tradWorld(sentence1.encode('utf-8')).items():
                 the_file.write('<*, *,'+ltl+', *>: '+trad+'\n')           
         #the_file.write('----\n')
      
