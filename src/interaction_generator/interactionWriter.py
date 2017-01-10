@@ -1,22 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-class interactionWriter():
+class actionWriter():
 	
-	def __init__(self,interaction):
+	def __init__(self,action):
 		
-		self.action = interaction
+		self.action = action
 		
 		
 	def writeAction(self, actionFile):
 		if 'IMAGES' in self.action.keys():
 			self.actionFile = open(actionFile+'image_'+self.action['NAME'], 'w')
 			self.writeImageSection()
-			self.actionFile.close()
-
-		if 'ANSWERS' in self.action.keys():
-			self.actionFile = open(actionFile+'answers_'+self.action['NAME'], 'w')
-			self.writeAnswerSection()
 			self.actionFile.close()
 
 		dict_keys, section_key = set(self.action.keys()), ['TEXTS','BUTTONS','GRAMMARS']
@@ -52,12 +47,11 @@ class interactionWriter():
 			pass
 
 	def writeButton(self,button_value):
-		#E.g. button = ('topic', buttonInstance1, buttonInstance2, ...) put button_value[1:]
-		#E.g. button = ('topic', [(button,Instance1), (button,Instance2), ...]) put button_value[1]
-		topic,text = button_value[0], button_value[1]
-		self.actionFile.write(topic+'\n')
-		for text1,text2 in text:
-			self.actionFile.write(text1+': '+text2+'\n')
+		#E.g. button = ('label', [(profile1,lang_text1), (profile2,lang_text2), ...])
+		label, value = button_value
+		self.actionFile.write(label+'\n')
+		for profile, lang_text in value:
+			self.actionFile.write(profile+': '+lang_text+'\n')
 			
 	def writeButtonsSection(self):
 		#E.g. buttons = (buttong, buttonr, ...)
