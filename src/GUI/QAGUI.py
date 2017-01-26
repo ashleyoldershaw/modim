@@ -24,7 +24,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../../diagdemos/eurobotics2017/') # to start directly with this demo
+demo_folder=os.path.dirname('../../../diagdemos/personalizedAssistance/') # to start directly with this demo
 
 import glob
 
@@ -275,17 +275,23 @@ class Network:
                   mode = split2[1]
                   interactionname = split2[2]
 
-                  if (mode == "txtimg"):
-                     action_filename = self.getActionFilename("text", interactionname)
-                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                  if (interactionname[0]=="["):
+                     #debug mode. Only TEXT
+                     actual_interaction=interactionname.strip("[]")
                      self.display("text", actual_interaction)
-                     action_filename = self.getActionFilename("image", interactionname)
-                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                     self.display("image", actual_interaction)
-                  else:
-                     action_filename = self.getActionFilename(mode, interactionname)
-                     actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                     self.display(mode, actual_interaction)
+                  else: 
+                     if (mode == "txtimg"):
+                        #Both TEXT and IMAGES mode
+                        action_filename = self.getActionFilename("text", interactionname)
+                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                        self.display("text", actual_interaction)
+                        action_filename = self.getActionFilename("image", interactionname)
+                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                        self.display("image", actual_interaction)
+                     else:
+                        action_filename = self.getActionFilename(mode, interactionname)
+                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                        self.display(mode, actual_interaction)
 
                elif (splitmsg[0] == 'ask'):
                   #This instruction involves displaying a text and showing a GUI with options for the user 
@@ -326,14 +332,18 @@ class Network:
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
                   interactionname = splitmsg[1]
-                  action_filename = self.getActionFilename("text", interactionname)
+                  if (interactionname[0]=="["):
+                     #debug mode. Only TEXT
+                     actual_interaction=interactionname.strip("[]")
+                     self.sayMessage(actual_interaction)
+                  else: 
+                     action_filename = self.getActionFilename("text", interactionname)
 
-                  #  look for the string to say according to user profile
-                  actual_interaction = eval_personalization_rules_actions(action_filename, profile)
-                  if (len(actual_interaction)>0):
-                     list_of_texts = actual_interaction.split("|")
-                     self.sayMessage(list_of_texts)
-
+                     #  look for the string to say according to user profile
+                     actual_interaction = eval_personalization_rules_actions(action_filename, profile)
+                     if (len(actual_interaction)>0):
+                        list_of_texts = actual_interaction.split("|")
+                        self.sayMessage(list_of_texts)
                
                elif (splitmsg[0] == 'set' and splitmsg[1] == 'profile' and len(splitmsg) == 3):
                   # tell the GUI to change demo
@@ -515,10 +525,10 @@ class demoSelectionGUI(object):
 
    def __init__(self, parent):
       global working_folder
-      if demo_folder=='':
-        working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
-      else:
-        working_folder = demo_folder    
+      #if demo_folder=='':
+      working_folder = tkFileDialog.askdirectory(parent=parent, initialdir=working_folder, title='Please select the demo directory')
+      #else:
+      #  working_folder = demo_folder    
       if len(working_folder) > 0:
          print "Demo selected: %s" % working_folder
 
