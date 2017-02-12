@@ -53,7 +53,10 @@ def generate(f, save_directory, topic_name, topic, topic_lang, lang):
         
 
     for line in f:
-        l, r = line.rstrip('\r\n').split('->')
+        ls = line.rstrip('\r\n')
+        if (not len(ls)>0):
+            continue
+        l, r = ls.split('->')
         r = r.strip()
         for m in l.split(','):
             item2 = etree.SubElement(oneof, 'item')
