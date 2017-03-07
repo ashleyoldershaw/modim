@@ -5,9 +5,33 @@
 \usepackage{amssymb}
 
 \begin{document}
-\title{{\bf MODIM: \\Multi-modal Interaction Manager.}\\ User guide}
-\author{Mar\'ia T. L\'azaro}
-\maketitle
+
+\begin{titlepage}
+\thispagestyle{empty}
+
+% Title
+\vspace{10cm}
+{\huge\center \bfseries  MODIM: }
+\\
+{\huge\center \bfseries Multi-modal Interaction Manager.}\\
+
+{\huge\center Software description}
+
+\vspace{5cm}
+\begin{flushright}
+{\large Contributors:\\
+Mar\'ia T. L\'azaro\\
+Federica Montesanti\\
+Eugenio Sebastiani\\
+Luca Iocchi}
+\end{flushright}
+\vfill
+
+
+\end{titlepage}
+
+
+%\maketitle
 
 \newpage
 \section{Introduction}
@@ -338,18 +362,24 @@ Table \ref{tab:grammarFileExample} (left) shows the equivalent text file to crea
 \begin{table}[h]
 {\ttfamily
 \begin{center}
-  \begin{tabular}{|l|l|}
+  \begin{tabular}{|l|}
     \hline
-\bf{confirm.txt} & \bf{confirm\_es-ES.txt} \\
+\bf{confirm.txt} \\
     \hline
-yes -> yes  & si -> yes\\
-no  -> no   & no -> no\\
-cancel, sorry I made a mistake -> cancel & cancelar, lo siento me he equivocado -> cancel \\
+yes -> yes\\
+no  -> no \\
+cancel, sorry I made a mistake -> cancel \\
+    \hline
+\bf{confirm\_es-ES.txt}\\
+    \hline
+si -> yes\\
+no -> no\\
+cancelar, lo siento me he equivocado -> cancel \\
     \hline
   \end{tabular}
 \end{center}
 }
-    \caption{Examples of text file to generate a grammar on the topic confirm. Left: english grammar. Right: spanish equivalent grammar.}
+    \caption{Examples of text file to generate a grammar on the topic confirm. Top: english grammar. Bottom: spanish equivalent grammar.}
     \label{tab:grammarFileExample}   
 \end{table}
 
