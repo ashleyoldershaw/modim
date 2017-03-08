@@ -128,6 +128,7 @@ def findSemanticButton(asrmsg):
    for button in net_ROS.buttons_to_display:
       topic = button[0]
       topics = topic.split("|")
+      print topics	
       if len(topics) > 1:
          if topics[1] == asrword:
             return topics[0]
@@ -884,7 +885,9 @@ class GUI(tk.Frame):
    def buttonsCallback(self, text):
       self.chosen_button_action = text
       print "User selection: " , self.chosen_button_action
-      net_ROS.sendMessage("BUTTON "+self.chosen_button_action+"\n\r")
+
+      topics = self.chosen_button_action.split("|")
+      net_ROS.sendMessage("BUTTON "+topics[0]+"\n\r")
 
       logger.log("BUTTON "+self.chosen_button_action+"\n")
       self.parent.event_generate("<<clearButtonsMessage>>")
