@@ -11,6 +11,7 @@ except ImportError:
    from Tkinter import *
 import PIL
 from PIL import Image, ImageTk
+# for ImageTk: sudo apt-get install python-imaging-tk
 
 import tkFileDialog
 
