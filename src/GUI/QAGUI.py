@@ -11,6 +11,7 @@ except ImportError:
    from Tkinter import *
 import PIL
 from PIL import Image, ImageTk
+# for ImageTk: sudo apt-get install python-imaging-tk
 
 import tkFileDialog
 
@@ -127,6 +128,7 @@ def findSemanticButton(asrmsg):
    for button in net_ROS.buttons_to_display:
       topic = button[0]
       topics = topic.split("|")
+      print topics	
       if len(topics) > 1:
          if topics[1] == asrword:
             return topics[0]
@@ -891,6 +893,7 @@ class GUI(tk.Frame):
    def buttonsCallback(self, text):
       self.chosen_button_action = text
       print "User selection: " , self.chosen_button_action
+
       topic = self.chosen_button_action.split("|")[0]
       net_ROS.sendMessage("BUTTON "+topic+"\n\r")
 
