@@ -23,8 +23,8 @@ import os
 script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
-demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../../diagdemos/personalizedAssistance/') # to start directly with this demo
+#demo_folder='' # to select the demo with a filedialog box
+demo_folder=os.path.dirname('../../../diagdemos/eurobotics2017/') # to start directly with this demo
 
 import glob
 
@@ -47,8 +47,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-ROS_SERVER_TCP_IP = '127.0.0.1'
-#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
+#ROS_SERVER_TCP_IP = '127.0.0.1'
+ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 #ROS_SERVER_TCP_IP = '192.168.0.204'
 ROS_SERVER_TCP_PORT = 9000
@@ -133,6 +133,7 @@ def findSemanticButton(asrmsg):
       elif len(topics) <= 1:
          if topics[0] == asrword:
             return topics[0]
+   return asrword         
          
       
    
@@ -244,10 +245,15 @@ class Network:
                   #self.textSynthTime = time.time()+1
                #elif (time.time() > self.textSynthTime):
                elif (TTSfree):
-                  print net_ROS.buttons_to_display
-                  outtopic = findSemanticButton(self.recvmsg)
-                  net_ROS.sendMessage("ASR "+ outtopic+"\n\r")
-                  print "ASR: ", self.recvmsg
+                  if (self.recvmsg.startswith("[")):
+                     net_ROS.sendMessage("ASR "+self.recvmsg+"\n\r")
+                  else:                     
+                     print "ASR: ", self.recvmsg
+                     print net_ROS.buttons_to_display
+                     outtopic = findSemanticButton(self.recvmsg)
+                     net_ROS.sendMessage("ASR SEMANTICS(\""+ outtopic+"\")\n\r")
+                  
+                  
                else:
                   print "Ignored ASR: ", self.recvmsg
             #elif (len(splitmsg) > 3 or len(splitmsg) < 2):
@@ -278,7 +284,7 @@ class Network:
                   if (interactionname[0]=="["):
                      #debug mode. Only TEXT
                      actual_interaction=interactionname.strip("[]")
-                     self.display("text", actual_interaction)
+                     self.display("text", [actual_interaction])
                   else: 
                      if (mode == "txtimg"):
                         #Both TEXT and IMAGES mode
@@ -335,7 +341,7 @@ class Network:
                   if (interactionname[0]=="["):
                      #debug mode. Only TEXT
                      actual_interaction=interactionname.strip("[]")
-                     self.sayMessage(actual_interaction)
+                     self.sayMessage([actual_interaction])
                   else: 
                      action_filename = self.getActionFilename("text", interactionname)
 
@@ -584,6 +590,7 @@ def setWidth(w, h, w_box, image, use_antialiasing):
 class GUI(tk.Frame):
 
    def __init__(self, parent):
+      global working_folder
       tk.Frame.__init__(self, parent)
       self.parent = parent
       net_ROS.setParent(self)
@@ -604,7 +611,8 @@ class GUI(tk.Frame):
       
       self.buttonsList = []  
       
-      demoSelectionGUI(self.parent)
+      #demoSelectionGUI(self.parent)
+      working_folder = demo_folder
       self.initDemo()
 
       self.initUI()
@@ -883,9 +891,10 @@ class GUI(tk.Frame):
    def buttonsCallback(self, text):
       self.chosen_button_action = text
       print "User selection: " , self.chosen_button_action
-      net_ROS.sendMessage("BUTTON "+self.chosen_button_action+"\n\r")
+      topic = self.chosen_button_action.split("|")[0]
+      net_ROS.sendMessage("BUTTON "+topic+"\n\r")
 
-      logger.log("BUTTON "+self.chosen_button_action+"\n")
+      logger.log("BUTTON "+topic+"\n")
       self.parent.event_generate("<<clearButtonsMessage>>")
 
    def displayButtons(self, event):

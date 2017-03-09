@@ -10,9 +10,9 @@ import threading
 # Global variables:
 # net_ROS and net_speech : objects of class Network
 SPEECH_SERVER_TCP_IP = '127.0.0.1'
-SPEECH_SERVER_TCP_PORT = 1800
+SPEECH_SERVER_TCP_PORT = 1801
 ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_PORT = 9001
+ROS_SERVER_TCP_PORT = 9000
 
 
 class App(tk.Tk):
