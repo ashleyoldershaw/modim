@@ -1,7 +1,6 @@
-This repository contains the HRI tools developed by the LabRococo group of La Sapienza.
+# MODIM: Multi-modal Interaction Manager #
+
 The repository is organized in different folders:
 - src. Contains the source files. 
 - demo. Contains a ready-to-use demonstration.
-
-Instructions for executing each tool are provided inside its respective folder.
-
+- doc. Contains the user-guide.
