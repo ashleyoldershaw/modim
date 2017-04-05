@@ -25,7 +25,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 #demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../../diagdemos/eurobotics2017/') # to start directly with this demo
+demo_folder=os.path.dirname('../../../diagdemos/peccioli/') # to start directly with this demo
 
 import glob
 
@@ -48,8 +48,8 @@ SPEECH_SERVER_TCP_PORT = 1800
 #SPEECH_SERVER_TCP_PORT = 1800
 #ROS_SERVER_TCP_IP = '10.10.10.30'
 #ROS_SERVER_TCP_IP = '192.168.43.2'
-#ROS_SERVER_TCP_IP = '127.0.0.1'
-ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
+ROS_SERVER_TCP_IP = '127.0.0.1'
+#ROS_SERVER_TCP_IP = '192.168.88.30' #cadomus, diago
 #ROS_SERVER_TCP_IP = '192.168.88.31' #romus
 #ROS_SERVER_TCP_IP = '192.168.0.204'
 ROS_SERVER_TCP_PORT = 9000
@@ -286,7 +286,7 @@ class Network:
                   if (interactionname[0]=="["):
                      #debug mode. Only TEXT
                      actual_interaction=interactionname.strip("[]")
-                     self.display("text", [actual_interaction])
+                     self.display("text", actual_interaction)
                   else: 
                      if (mode == "txtimg"):
                         #Both TEXT and IMAGES mode
@@ -375,6 +375,7 @@ class Network:
       return rules_fullfilename
 
    def display(self, mode, actual_interaction):
+      print actual_interaction
       if (len(actual_interaction)>0):
          # if (text) : show actual_interaction as a label in the GUI
          if (mode == 'text'):
