@@ -25,7 +25,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 #demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../../diagdemos/peccioli/') # to start directly with this demo
+demo_folder=os.path.dirname('../../demo/eurobotics/') # to start directly with this demo
 
 import glob
 
@@ -435,9 +435,9 @@ class Network:
       self.thread_stop.set()
       print 'Finishing threads...'
       time.sleep(5)
-      
-      if (self.recvThread.isAlive() or self.netStatusThread.isAlive()):
-         print 'ups.. some thread still alive'
+      if self.netStatusOk:
+         if (self.recvThread.isAlive() or self.netStatusThread.isAlive()):
+            print 'ups.. some thread still alive'
       
       self.sock.close()
       print "Connection to %s:%s closed." % (self.serverTcpIP,self.serverPort)
