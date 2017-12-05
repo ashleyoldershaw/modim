@@ -1,0 +1,39 @@
+#Format: <age, gender, language, occupation>:"Text to say"
+#age = [adult | senior | junior]
+#gender = [m | f]
+#language = [en | fr | it | sp]
+#occupation = [student | professor | visitor]
+#write character '*' for default option
+TEXTS
+<*,*,*,*>:"What is your favourite color?"
+<*,*,es,*>:"¿Cual es tu color preferido?"
+----
+BUTTONS
+green
+<*,*,*,*>: Green
+<*,*,es,*>: Verde
+blue
+<*,*,*,*>: Blue
+<*,*,es,*>: Azul
+red
+<*,*,*,*>: Red
+yellow
+   <*,*,*,*>: Yellow
+<*,*,es,*>: Amarillo	
+orange
+<*,*,*,*>: Orange
+white
+<*,*,*,*>: White
+black
+<*,*,*,*>: Black
+----
+ASRCMD 
+<*,*,*,*>: [LOAD_GRAMMAR] frame_colornames
+----
+IMAGES 
+<*,*,*,*>: path-to/image.png
+----
+
+
+
+
