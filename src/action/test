@@ -4,7 +4,7 @@
 #language = [en | fr | it | sp]
 #occupation = [student | professor | visitor]
 #write character '*' for default option
-TEXTS
+TEXT
 <*,*,*,*>:"What is your favourite color?"
 <*,*,es,*>:"¿Cual es tu color preferido?"
 ----
@@ -30,7 +30,7 @@ black
 ASRCMD 
 <*,*,*,*>: [LOAD_GRAMMAR] frame_colornames
 ----
-IMAGES 
+IMAGE
 <*,*,*,*>: path-to/image.png
 ----
 

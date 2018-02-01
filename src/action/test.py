@@ -9,12 +9,15 @@ action = ActionReader("testwrite")
 profile = ['*', '*', 'es', '*']
 
 pm = ProfileMatcher(action, profile)
-pm.evalSection('TEXTS')
+pm.evalSection('TEXT')
 pm.evalSection('BUTTONS')
 
 profile = ['*', '*', 'it', '*']
 pm.setProfile(profile)
-pm.evalSection('TEXTS')
-pm.evalSection('IMAGES')
-
-
+pm.evalSection('TEXT')
+print pm.evalSection('TEXT')
+pm.evalSection('IMAGE')
+pm.evalSection('BUTTONS')
+print pm.evalSection('BUTTONS')
+pm.evalSection('ASRCMD')
+print pm.evalSection('ASRCMD')

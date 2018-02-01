@@ -1,20 +1,34 @@
 import os
 
+def parseProfile(profile):
+    parsedProfile = profile.lstrip('<').rstrip('> ')
+    parsedProfile = parsedProfile.replace(" ","").split(',')
+    return parsedProfile
+
+def parseContent(content):
+    #removes unncessary spaces and the text quotes (")
+    parsedContent = content.replace("\"","").strip(" \t\n")
+    return parsedContent
+
 class ActionReader(dict):
     def __init__(self, actionFilename):
         self.actionFile = []
+        
         try:
             print 'openning ', actionFilename
             self.actionFile = open(actionFilename, 'rU')
             
         except IOError:
             print 'cannot open', actionFilename
-            return ''
+            return None
 
         #initializing action
         self['NAME'] = os.path.basename(actionFilename)
-        
-        self.parseActionFile()
+
+        if self['NAME'] == 'init':
+            self.parseInitActionFile()
+        else:
+            self.parseActionFile()
 
     def parseActionFile(self):
         sectionRules = []
@@ -22,7 +36,7 @@ class ActionReader(dict):
         for line in self.actionFile.readlines():
             line = line.replace("\"","").strip(" \t\n")
             if len(line) > 0 and line[0] != '#': #comment or empty line
-                if (line == "TEXTS" or line == "BUTTONS" or line == "ASRCMD" or line == "IMAGES"):
+                if (line == "TEXT" or line == "BUTTONS" or line == "ASRCMD" or line == "IMAGE"):
                     #starting section
                     sectionType = line
                     continue
@@ -37,7 +51,7 @@ class ActionReader(dict):
         print self
         
     def parseSectionRules(self, sectionType, sectionRules):
-        if (sectionType == "TEXTS" or sectionType == "ASRCMD" or sectionType == "IMAGES"):
+        if (sectionType == "TEXT" or sectionType == "ASRCMD" or sectionType == "IMAGE"):
             ruleList = []
             for rule in sectionRules:
                 parsedRule = self.parseRule(rule)
@@ -77,18 +91,20 @@ class ActionReader(dict):
         parsedRule = ""
         splitRule = rule.split(':',1)
         if len(splitRule) == 2:
-            profile = self.parseProfile(splitRule[0])
-            content = self.parseContent(splitRule[1])
+            profile = parseProfile(splitRule[0])
+            content = parseContent(splitRule[1])
             parsedRule = (profile, content)
 
         return parsedRule
 
-    def parseProfile(self, profile):
-        parsedProfile = profile.lstrip('<').rstrip('> ')
-        parsedProfile = parsedProfile.replace(" ","").split(',')
-        return parsedProfile
+    def parseInitActionFile(self):
+        #parses the init file
+        for line in self.actionFile.readlines():
+            if line[0] != '\n':
+                linesplit = line.strip("\n").split(":")
+                if len(linesplit) == 2:
+                    sectionType = linesplit[0]
+                    content = parseContent(linesplit[1])
+                    self[sectionType] = content
+                
 
-    def parseContent(self, content):
-        #removes unncessary spaces and the text quotes (")
-        parsedContent = content.replace("\"","").strip(" \t\n")
-        return parsedContent

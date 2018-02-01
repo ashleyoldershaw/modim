@@ -11,6 +11,8 @@ class ProfileMatcher():
         self.profile = profile
 
     def evalSection(self, sectionType):
+        if not sectionType in self.action:
+            return ""
         if sectionType == "BUTTONS":
             buttonsList = self.action[sectionType]
             finalButtons = []
