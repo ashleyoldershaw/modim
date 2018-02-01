@@ -25,15 +25,17 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 #demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../demo/eurobotics/') # to start directly with this demo
+demo_folder=os.path.dirname('../../demo/euroboticsnew/') # to start directly with this demo
 
 import glob
 
-from parse_rules_file import *
+import sys
+sys.path.append('../action')
+from actionReader import *
+from actionWriter import ActionWriter
+from profileMatcher import ProfileMatcher
 
-profile = parseProfile('<*,*,*,*>') #the default profile
-
-
+profile = ['*', '*', '*', '*'] #the default profile
 
 #demos_filename = "demos"
 
@@ -280,25 +282,25 @@ class Network:
 
                elif (splitmsg[0] == 'display'):
                   split2 = self.recvmsg.split("_",2) #E.g. for display_text_question_animal_001 returns ['display', 'text', 'question_animal_001']
-                  mode = split2[1]
+                  mode = split2[1].upper()
                   interactionname = split2[2]
+                  action_filename = self.getActionFilename(interactionname)
 
+                  action = ActionReader(action_filename)
+                  pm = ProfileMatcher(action, profile)
                   if (interactionname[0]=="["):
                      #debug mode. Only TEXT
                      actual_interaction=interactionname.strip("[]")
-                     self.display("text", actual_interaction)
+                     self.display('TEXT', actual_interaction)
                   else: 
-                     if (mode == "txtimg"):
-                        #Both TEXT and IMAGES mode
-                        action_filename = self.getActionFilename("text", interactionname)
-                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                        self.display("text", actual_interaction)
-                        action_filename = self.getActionFilename("image", interactionname)
-                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                        self.display("image", actual_interaction)
+                     if (mode == 'TXTIMG'):
+                        #Both TEXT and IMAGE mode
+                        actual_interaction = pm.evalSection('TEXT')
+                        self.display('TEXT', actual_interaction)
+                        actual_interaction = pm.evalSection('IMAGE')
+                        self.display('IMAGE', actual_interaction)
                      else:
-                        action_filename = self.getActionFilename(mode, interactionname)
-                        actual_interaction= eval_personalization_rules_actions(action_filename, profile)
+                        actual_interaction= pm.evalSection(mode)
                         self.display(mode, actual_interaction)
 
                elif (splitmsg[0] == 'ask'):
@@ -306,14 +308,18 @@ class Network:
                   print "ASK RECEIVED: ", self.recvmsg
                   split2 = self.recvmsg.split("_",1)
                   interactionname = split2[1]
-                  action_filename = self.getActionFilename("text", interactionname)
-                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                  self.display("text", actual_interaction)
+                  action_filename = self.getActionFilename(interactionname)
 
-                  self.buttons_to_display = eval_personalization_rules_buttons(action_filename, profile)
+                  action = ActionReader(action_filename)
+                  pm = ProfileMatcher(action, profile)
+                  
+                  actual_interaction = pm.evalSection('TEXT')
+                  self.display('TEXT', actual_interaction)
+                  
+                  self.buttons_to_display = pm.evalSection('BUTTONS')
                   buttonsTriggered = False
 
-                  grammar_command = eval_personalization_rules_grammar(action_filename, profile)
+                  grammar_command = pm.evalSection('ASRCMD')
                   if len(grammar_command) > 0:
                      net_speech.sendMessage(grammar_command+"\n")
 
@@ -322,21 +328,24 @@ class Network:
                   print "ASK IMG RECEIVED: ", self.recvmsg
                   split2 = self.recvmsg.split("_",1)
                   interactionname = split2[1]
-                  action_filename = self.getActionFilename("text", interactionname)
-                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                  self.display("text", actual_interaction)
+                  action_filename = self.getActionFilename(interactionname)
 
-                  self.buttons_to_display = eval_personalization_rules_buttons(action_filename, profile)
+                  action = ActionReader(interactionname)
+                  pm = ProfileMatcher(action, profile)
+                           
+                  actual_interaction = pm.evalSection('TEXT')
+                  self.display('TEXT', actual_interaction)
+                  
+                  self.buttons_to_display = pm.evalSection('BUTTONS')
                   buttonsTriggered = False
 
-                  grammar_command = eval_personalization_rules_grammar(action_filename, profile)
+                  grammar_command = pm.evalSection('ASRCMD')
                   if len(grammar_command) > 0:
                      net_speech.sendMessage(grammar_command+"\n")
 
-                  action_filename = self.getActionFilename("image", interactionname)
-                  actual_interaction= eval_personalization_rules_actions(action_filename, profile)
-                  self.display("image", actual_interaction)
-
+                  actual_interaction = pm.evalSection('IMAGE')
+                  self.display('IMAGE', actual_interaction)
+                  
                elif (splitmsg[0] == 'say' and  len(splitmsg) == 2):
                   # if (say_something) coming from tcp_interface: 
                   interactionname = splitmsg[1]
@@ -344,11 +353,13 @@ class Network:
                      #debug mode. Only TEXT
                      actual_interaction=interactionname.strip("[]")
                      self.sayMessage([actual_interaction])
-                  else: 
-                     action_filename = self.getActionFilename("text", interactionname)
+                  else:
+                     action_filename = self.getActionFilename(interactionname)
+                     action = ActionReader(action_filename)
+                     pm = ProfileMatcher(action, profile)
 
                      #  look for the string to say according to user profile
-                     actual_interaction = eval_personalization_rules_actions(action_filename, profile)
+                     actual_interaction = pm.evalSection('TEXT')
                      if (len(actual_interaction)>0):
                         list_of_texts = actual_interaction.split("|")
                         self.sayMessage(list_of_texts)
@@ -367,10 +378,10 @@ class Network:
 
       print 'Finished receive thread'
 
-   def getActionFilename(self, mode, interactionname):
-      rules_filename = "_".join([mode, interactionname])
+   def getActionFilename(self, interactionname):
+      #rules_filename = "_".join([mode, interactionname])
       #to correctly load the file if the GUI is not executed from the current dir
-      rules_fullfilename = os.path.join(working_folder, "actions/"+rules_filename)
+      rules_fullfilename = os.path.join(working_folder, "actions/"+interactionname)
    
       return rules_fullfilename
 
@@ -378,14 +389,14 @@ class Network:
       print actual_interaction
       if (len(actual_interaction)>0):
          # if (text) : show actual_interaction as a label in the GUI
-         if (mode == 'text'):
+         if (mode == 'TEXT'):
             list_of_texts = actual_interaction.split("|")
             self.text_to_display = list_of_texts[0]
             self.parent.ltext.event_generate("<<NewTextMessage>>", when='tail')
             self.sayMessage(list_of_texts)
       
          # if (image) : show image in actual_interaction as an image in the GUI
-         if (mode == 'image'):
+         if (mode == 'IMAGE'):
             self.image_to_display = actual_interaction
             self.parent.rimg.event_generate("<<NewImgMessage>>", when='tail')
       
@@ -495,34 +506,30 @@ class languageSelectionGUI(object):
          lang_profiles_filename = sys.argv[1]
       else:
          lang_profiles_filename = "lang_instance"
-      try:
-         lang_profiles_filename = os.path.join(working_folder, lang_profiles_filename)
-         f = open(lang_profiles_filename, 'r')
-      except IOError:
-         print 'cannot open', lang_profiles_filename
-      else:
 
-         def callback(text, button):
-            self.chosen_profile = text
-            self.button = button
-            self.toplevel.destroy()
+      lang_profiles_filename = os.path.join(working_folder, lang_profiles_filename)
+      lang_action = ActionReader(lang_profiles_filename)
 
-         list_of_rules = parseRulesFile(f)
-         print list_of_rules
+      def callback(text, button):
+         self.chosen_profile = text
+         self.button = button
+         self.toplevel.destroy()
 
-         for profile in list_of_rules:
-            language = profile[0]
-            rel_path = profile[1]
-            abs_file_path = os.path.join(working_folder, rel_path)
-            imgbutton = PIL.Image.open(abs_file_path)
-            w, h = imgbutton.size            
-            imgbutton_resized = setHeight(w, h, hbutton, imgbutton, True)
-            phbutton = ImageTk.PhotoImage(imgbutton_resized)
-            btn = tk.Button(self.toplevel, image=phbutton, command=lambda language=language, button=imgbutton_resized: callback(language, button))
-            btn.image = phbutton
-            btn.pack(side=LEFT)
-            
-         f.close()
+      list_of_rules = lang_action['IMAGE']
+      print list_of_rules
+      
+      for profile in list_of_rules:
+         language = profile[0]
+         rel_path = profile[1]
+         abs_file_path = os.path.join(working_folder, rel_path)
+         imgbutton = PIL.Image.open(abs_file_path)
+         w, h = imgbutton.size            
+         imgbutton_resized = setHeight(w, h, hbutton, imgbutton, True)
+         phbutton = ImageTk.PhotoImage(imgbutton_resized)
+         btn = tk.Button(self.toplevel, image=phbutton, command=lambda language=language, button=imgbutton_resized: callback(language, button))
+         btn.image = phbutton
+         btn.pack(side=LEFT)
+         
 
    def show(self):
       self.toplevel.deiconify()
@@ -628,7 +635,7 @@ class GUI(tk.Frame):
       print "working folder: ", working_folder
 
       init_filename = os.path.join(working_folder, "init")
-      self.config = parse_init_file(init_filename)
+      self.config = ActionReader(init_filename)
       print self.config
 
       self.question = StringVar()
@@ -662,7 +669,9 @@ class GUI(tk.Frame):
       # Profile selection button
       if (multilang == 'YES'):
          lang_file = os.path.join(working_folder, "lang_instance")
-         actual_interaction = eval_personalization_rules_actions(lang_file, profile)
+         lang_action = ActionReader(lang_file)
+         pm = ProfileMatcher(lang_action, profile)
+         actual_interaction = pm.evalSection('IMAGE')
          abs_file_path = os.path.join(working_folder, actual_interaction)
          imgbutton = PIL.Image.open(abs_file_path)
          w, h = imgbutton.size            

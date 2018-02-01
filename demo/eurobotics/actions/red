@@ -1,0 +1,6 @@
+TEXT
+<*,*,*,*>:"I like red apples"
+----
+IMAGE
+<*, *, *, *>:  "img/red.jpg"
+----

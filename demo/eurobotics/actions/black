@@ -1,0 +1,6 @@
+TEXT
+<*,*,*,*>:"Look at this black panther!"
+----
+IMAGE
+<*, *, *, *>:  "img/black.jpg"
+----

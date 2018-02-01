@@ -1,7 +1,0 @@
-#Format: <age, gender, language, occupation>:"path_to_image"
-#age = [adult | senior | junior]
-#gender = [m | f]
-#language = [en | fr | it | sp]
-#occupation = [student | professor | visitor]
-#write character '*' for default option
-<*, *, *, *>:  "img/green.jpg"

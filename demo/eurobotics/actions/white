@@ -1,0 +1,6 @@
+TEXT
+<*,*,*,*>:"Look at this white lion!"
+----
+IMAGE
+<*, *, *, *>:  "img/white.jpg"
+----

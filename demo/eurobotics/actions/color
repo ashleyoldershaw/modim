@@ -1,9 +1,4 @@
-#Format: <age, gender, language, occupation>:"Text to say"
-#age = [adult | senior | junior]
-#gender = [m | f]
-#language = [en | fr | it | sp]
-#occupation = [student | professor | visitor]
-#write character '*' for default option
+TEXT
 <*,*,*,*>:"What is your favourite color?"
 ----
 BUTTONS
@@ -24,8 +19,4 @@ black
 ----
 ASRCMD 
 <*,*,*,*>: [LOAD_GRAMMAR] frame_colornames
-
-
-
-
-
+----

@@ -1,0 +1,6 @@
+TEXT
+<*,*,*,*>:"Look at this blue whale!"
+----
+IMAGE
+<*, *, *, *>:  "img/blue.jpg"
+----

@@ -1,0 +1,6 @@
+TEXT
+<*,*,*,*>:"I also like dogs"
+----
+IMAGE
+<*, *, *, *>:  "img/dog.jpg"
+----
