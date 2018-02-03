@@ -15,3 +15,24 @@ Implemented actions:
 - ask_action: displays a text (usually a question) and a set of buttons contained in a file text_action
 - askimg_action: displays a text and buttons contained in a file text_action and an image contained in image_action
 - set_profile_<*,*,*,*>: changes the current profile to <*,*,*,*>
+
+===========================================================================================
+
+HTML/JavaScript/Websocket version
+
+1. Run ws server
+
+python ws_server.py
+
+2. Run the web page
+
+firefox QAGUI.html
+
+3. Run the interaction
+
+python demo1.py
+
+
+
+
+
