@@ -9,9 +9,13 @@ except ImportError:
    # for Python2
    import Tkinter as tk
    from Tkinter import *
+
 import PIL
-from PIL import Image, ImageTk
-# for ImageTk: sudo apt-get install python-imaging-tk
+
+try:
+    from PIL import Image, ImageTk
+except:
+    print("Please install ImageTk: sudo apt-get install python-imaging-tk")
 
 import tkFileDialog
 
@@ -25,7 +29,7 @@ script_dir = os.path.dirname(__file__)
 working_folder = script_dir
 
 #demo_folder='' # to select the demo with a filedialog box
-demo_folder=os.path.dirname('../../demo/euroboticsnew/') # to start directly with this demo
+demo_folder=os.path.dirname('../../demo/eurobotics/') # to start directly with this demo
 
 import glob
 
@@ -1002,6 +1006,7 @@ class GUI(tk.Frame):
 
    def quit(self):
       #self.thread_stop.set()
+      print "Quit. Please wait..."
       time.sleep(5)
       net_ROS.closeConnection()
       net_speech.closeConnection()
