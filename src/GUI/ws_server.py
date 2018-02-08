@@ -1,19 +1,19 @@
 # http://www.html.it/pag/53419/websocket-server-con-python/
 # sudo -H easy_install tornado
 
-import tornado.httpserver
-import tornado.websocket
-import tornado.ioloop
-import tornado.web
+import sys
 import socket
 import time
 from threading import Thread
 
-#from dummy_robot import begin,end,forward,backward,left,right
+import tornado.httpserver
+import tornado.websocket
+import tornado.ioloop
+import tornado.web
 
-#import sys
-#sys.path.append('../program')
-
+sys.path.append('/home/iocchi/src/Pepper/pepper_tools/cmd_server')
+import pepper_cmd
+from pepper_cmd import *
 
 
 # Global variables
@@ -25,6 +25,7 @@ code = None
 status = "Idle"             # robot status sent to websocket
 last_answer = None
 return_value = "OK"
+reset_answer = False               # Request to stop waiting for answers
 
 # Basic UI functions
 
@@ -61,12 +62,32 @@ def remove_buttons():
     return_value = "OK"
 
 def answer():
-    global last_answer, return_value
-    while (last_answer is None):
+    global last_answer, return_value, reset_answer
+    reset_answer = False
+    while (last_answer is None and not reset_answer):
         time.sleep(0.5)
-        print "Answer: ",last_answer
+        #print "Answer: ",last_answer
     return_value = last_answer
 
+def cancel_answer():
+    global reset_answer
+    reset_answer = True
+
+def sensor(data):
+    global return_value
+    val = None
+    print "Sensor ",data
+    if (data=='headtouch'):
+        val = pepper_cmd.headTouch
+    elif (data=='frontsonar'):
+        val = pepper_cmd.sonarValues[0]
+    elif (data=='backsonar'):
+        val = pepper_cmd.sonarValues[1]
+    print "Sensor value = ",val
+    if (val==None):
+        return_value = "ERR"
+    else:
+        return_value = str(val)
 
 
 # TCP command server
@@ -182,6 +203,9 @@ if __name__ == "__main__":
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
     t.start()
 
+    # Connection to robot
+    print "Connecting to Pepper robot..."
+    robotconnect()
 
     # Run websocket server
     application = tornado.web.Application([
