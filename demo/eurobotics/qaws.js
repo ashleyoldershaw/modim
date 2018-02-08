@@ -58,6 +58,9 @@ function wsrobot_init(ip) {
 
             }
         }
+        else if (v[0]=='reload') {
+            location.reload();
+        }
     } 
 
     websocket.onopen = function(){

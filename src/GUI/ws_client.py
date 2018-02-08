@@ -55,7 +55,7 @@ def csend(data):
     except KeyboardInterrupt:
         rdata = "user quit"
     return rdata
-    #print "Reply: ",rdata
+    print "Reply: ",rdata
 
 def cclose():
     global csock

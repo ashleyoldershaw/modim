@@ -4,7 +4,8 @@
 import sys
 import socket
 import time
-from threading import Thread
+#from threading import Thread
+from thread2 import Thread
 
 import tornado.httpserver
 import tornado.websocket
@@ -20,12 +21,26 @@ from pepper_cmd import *
 
 websocket_server = None     # websocket handler
 run = True                  # main_loop run flag
+run_thread = None           # thread running the code
 server_port = 9000          # web server port
-code = None
+code_running = False        # code running
 status = "Idle"             # robot status sent to websocket
 last_answer = None
 return_value = "OK"
-reset_answer = False               # Request to stop waiting for answers
+reset_answer = False        # Request to stop waiting for answers
+conn_client = None          # Connected client
+
+
+
+
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
+
 
 # Basic UI functions
 
@@ -42,10 +57,17 @@ def websend(data):
         websocket_server = None
 
 def begin():
+    global code_running
     print "Start interaction"
+    code_running = True
     cancel_answer()
     remove_buttons()
     pepper_cmd.begin()
+
+def end():
+    global code_running
+    code_running = False
+    pepper_cmd.end()
 
 # Export commands, must set global variable return_value
 def display_text(data):
@@ -94,7 +116,9 @@ def ask(data):
     display_buttons(data)    
     a = answer()
     remove_buttons()
-    return a.rstrip()
+    if (a is not None):
+        a = a.rstrip()
+    return a
 
 
 def sensorvalue(data):
@@ -110,10 +134,32 @@ def sensorvalue(data):
     print "Sensor value = ",val
     return val
 
-# TCP command server
 
-def run_code(code, conn):
-    global status, return_value
+def client_return():
+    global conn_client
+    if (conn_client is None):
+        return
+    try:
+        conn_client.send("%r\n" %return_value)
+    except Exception as e:
+        print(RED+"Run code: Connection error"+RESET)
+        print e
+
+
+def ifreset(killthread=False):
+    global run_thread, code_running
+    cancel_answer()
+    websend("reload")
+    time.sleep(0.5)
+    client_return()
+    if (killthread and code_running):
+        run_thread.terminate()
+        print "Run code thread: ",run_thread," terminated."
+        code_running = False
+# Run the code
+
+def run_code(code):
+    global status, return_value, conn_client
     if (code is None):
         return
     print("=== Start code run ===")
@@ -126,12 +172,13 @@ def run_code(code, conn):
         print("CODE EXECUTION ERROR")
         print e
     status = "Idle"
+    ifreset()
     print("=== End code run ===")
-    conn.send("%s\n" %return_value)
 
+# TCP command server
 
 def start_cmd_server(TCP_PORT):
-    global run, return_value
+    global run, return_value, run_thread, conn_client
 
     TCP_IP = ''
     BUFFER_SIZE = 20000
@@ -145,13 +192,12 @@ def start_cmd_server(TCP_PORT):
         print "GUI Program Server: bind error"
         run=False        
     
-
     while run:
-        print "GUI Program Server: listening on port", TCP_PORT
+        print "%sGUI Program Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET)
         connected = False
-        conn = None
+        conn_client = None
         try:
-            conn, addr = s.accept()
+            conn_client, addr = s.accept()
             print "Connection address:", addr
             connected = True
         except KeyboardInterrupt:
@@ -159,25 +205,24 @@ def start_cmd_server(TCP_PORT):
             run = False
         while connected:
             try:
-                data = conn.recv(BUFFER_SIZE)
+                data = conn_client.recv(BUFFER_SIZE)
             except:
-                print "Connection closed."
+                print "Cmd server: connection closed."
                 break
             if not data: break
             print "Received: ",data
 
             if (data!='***STOP***'):
-                t = Thread(target=run_code, args=(data,conn,))
-                t.start()
-
+                run_thread = Thread(target=run_code, args=(data,))
+                run_thread.start()
+                print "Thread started: ",run_thread
             #run_code(data)
             #conn.send("%s\n" %return_value)
 
-        if (conn is not None):
-            conn.close()
-        print "Closed connection"
-
-
+        if (conn_client is not None):
+            conn_client.close()
+        print "Cmd server: end connection"
+        ifreset(True)
 
 
 
@@ -199,7 +244,8 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         last_answer = message
   
     def on_close(self):
-        print('Connection closed')
+        print(RED+'Websocket: connection closed'+RESET)
+        ifreset(True)
         websocket_server = None
   
     def on_ping(self, data):
@@ -234,14 +280,14 @@ if __name__ == "__main__":
     try:
         robotconnect()
     except RuntimeError:
-        print("Cannot connect to robot")
+        print(RED+"Cannot connect to robot"+RESET)
 
     # Run websocket server
     application = tornado.web.Application([
         (r'/websocketserver', MyWebSocketServer),])  
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(server_port)
-    print("Websocket server: listening on port %d" %(ws_server_port))
+    print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
     try:
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
