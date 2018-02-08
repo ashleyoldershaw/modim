@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QA GUI</title>
+
+  <script src="qaws.js"></script>
+
+  <style>
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 160%;
+    }
+  </style>
+</head>
+<body>
+
+    <!-- status -->
+    <div align='right' id='status'> <font color='red'>o</font> </div>
+
+    <!-- image -->
+    <p>
+    <div align='center'> <img height=300 id='image' src="default.jpg" alt="No image"/> </div>
+    </p>
+
+    <!-- text -->
+
+    <p>
+    <h1>
+    <div align='center' id='text'>Default text</div>
+    </h1>
+    </p>
+
+    <!-- buttons -->
+  
+    <p>
+      <div align='center' id='buttons'>
+      </div>
+    </p>
+
+
+  <!-- ****** SCRIPTS ****** -->
+
+  <script>
+
+    var ip='127.0.0.1';
+
+    console.log("Trying connection...")
+    wsrobot_init(ip);
+
+  </script>
+
+</body>
+</html>
+

@@ -31,6 +31,9 @@ reset_answer = False               # Request to stop waiting for answers
 
 def websend(data):
     global websocket_server
+    if websocket_server==None:
+        print "websocket server not connected"
+        return
     try:
         websocket_server.write_message(data)
         #print(status)
@@ -51,9 +54,9 @@ def display_text(data):
     return_value = "OK"
 
 def display_image(data):
-    global return_value
-    websend("display_image_"+data)
-    return_value = "OK"
+    imgfile = "img/"+data+".jpg"
+    websend("display_image_"+imgfile)
+
 
 def display_imagebuttons(data): 
     global last_answer, return_value
@@ -81,12 +84,20 @@ def answer():
         time.sleep(0.5)
         #print "Answer: ",last_answer
     return_value = last_answer
+    return return_value
 
 def cancel_answer():
     global reset_answer
     reset_answer = True
 
-def sensor(data):
+def ask(data):
+    display_buttons(data)    
+    a = answer()
+    remove_buttons()
+    return a.rstrip()
+
+
+def sensorvalue(data):
     global return_value
     val = None
     print "Sensor ",data
@@ -97,11 +108,7 @@ def sensor(data):
     elif (data=='backsonar'):
         val = pepper_cmd.sonarValues[1]
     print "Sensor value = ",val
-    if (val==None):
-        return_value = "ERR"
-    else:
-        return_value = str(val)
-
+    return val
 
 # TCP command server
 
@@ -130,10 +137,14 @@ def start_cmd_server(TCP_PORT):
     BUFFER_SIZE = 20000
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((TCP_IP,TCP_PORT))
-    s.listen(1)
-
-    run=True
+    try:
+        s.bind((TCP_IP,TCP_PORT))
+        s.listen(1)
+        run=True
+    except:
+        print "GUI Program Server: bind error"
+        run=False        
+    
 
     while run:
         print "GUI Program Server: listening on port", TCP_PORT
@@ -220,7 +231,10 @@ if __name__ == "__main__":
 
     # Connection to robot
     print "Connecting to Pepper robot..."
-    robotconnect()
+    try:
+        robotconnect()
+    except RuntimeError:
+        print("Cannot connect to robot")
 
     # Run websocket server
     application = tornado.web.Application([

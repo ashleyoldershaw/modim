@@ -7,7 +7,8 @@ import importlib
 import re
 import argparse
 import time
-
+import inspect
+import textwrap
 
 server_ip = '127.0.0.1'
 server_port = 9100
@@ -45,54 +46,33 @@ def csendfile(program):
 
 def csend(data):
     global csock
+    if csock==None:
+        cconnect()
     csock.send(data)
     time.sleep(0.5)
-    rdata = csock.recv(200)
+    try:
+        rdata = csock.recv(200)
+    except KeyboardInterrupt:
+        rdata = "user quit"
     return rdata
     #print "Reply: ",rdata
 
 def cclose():
     global csock
     csock.close()
-
     print("Closed connection")
+    csock = None
 
 
-def begin():
+def run_interaction(interaction):
+    lcode = inspect.getsourcelines(interaction)
+    code = ""
+    for l in lcode[0][1:]:
+        code += l
+    code = textwrap.dedent(code)
+    print code
     cconnect()
-
-def end():
-    cclose()
-
-
-def display_text(data):
-    #TODO transform abstract data to concrete values
-    csend("display_text('"+data+"')")    
-
-
-def display_image(data):
-    #TODO transform abstract data to concrete values
-    #imgfile = demodir+"/img/"+data+".jpg"
-    imgfile = "img/"+data+".jpg"
-    csend("display_image('"+imgfile+"')")    
-
-
-def ask(data):
-    csend("display_buttons("+data+")")    
-    a = csend("answer()")
-    csend("remove_buttons()")    
-    return a.rstrip()
-
-def say(data):
-    #TODO transform abstract data to concrete values
-    csend("say('"+data+"')")    
-
-def sensorvalue(data):
-    a = csend("sensor('"+data+"')")
-    return float(a.rstrip())
-
-def stand():
-    csend("stand()")    
+    csend(code)
 
 
 def main():
