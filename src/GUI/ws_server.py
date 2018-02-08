@@ -38,6 +38,12 @@ def websend(data):
         #print('Connection closed.')
         websocket_server = None
 
+def begin():
+    print "Start interaction"
+    cancel_answer()
+    remove_buttons()
+    pepper_cmd.begin()
+
 # Export commands, must set global variable return_value
 def display_text(data):
     global return_value
@@ -47,6 +53,13 @@ def display_text(data):
 def display_image(data):
     global return_value
     websend("display_image_"+data)
+    return_value = "OK"
+
+def display_imagebuttons(data): 
+    global last_answer, return_value
+    for d in data:
+        websend("display_imagebutton_"+d)
+    last_answer = None
     return_value = "OK"
 
 def display_buttons(data): 
@@ -92,8 +105,8 @@ def sensor(data):
 
 # TCP command server
 
-def run_code(code):
-    global status
+def run_code(code, conn):
+    global status, return_value
     if (code is None):
         return
     print("=== Start code run ===")
@@ -107,6 +120,7 @@ def run_code(code):
         print e
     status = "Idle"
     print("=== End code run ===")
+    conn.send("%s\n" %return_value)
 
 
 def start_cmd_server(TCP_PORT):
@@ -141,11 +155,12 @@ def start_cmd_server(TCP_PORT):
             if not data: break
             print "Received: ",data
 
-            #t = Thread(target=run_code, args=(data,))
-            #t.start()
+            if (data!='***STOP***'):
+                t = Thread(target=run_code, args=(data,conn,))
+                t.start()
 
-            run_code(data)
-            conn.send("%s\n" %return_value)
+            #run_code(data)
+            #conn.send("%s\n" %return_value)
 
         if (conn is not None):
             conn.close()
