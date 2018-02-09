@@ -7,10 +7,17 @@ from ws_client import *
 def interaction():
     begin()
 
+
     im.setProfile(['*', '*', 'es', '*'])
     im.setPath('../../demo/eurobotics/')
+
+    # im.init()
+
+
     a = im.ask('animal')
     print a
+
+    say("You have selected "+a)
 
     im.executeModality("TEXT","Hai scelto "+a)
 

@@ -47,7 +47,9 @@
 
   <script>
 
-    var ip='127.0.0.1';
+    var ip=window.location.hostname;
+    if (ip=='')
+        ip='127.0.0.1';
 
     console.log("Trying connection...")
     wsrobot_init(ip);
