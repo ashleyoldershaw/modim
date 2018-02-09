@@ -12,6 +12,7 @@ class InteractionManager:
     def __init__(self, display):
         self.profile =  ['*', '*', '*', '*']
         self.path = '.'
+        self.config = []
         self.display = display
         
     def setProfile(self, profile):
@@ -23,7 +24,12 @@ class InteractionManager:
     def getActionFilename(self, actionname):
         actionFullPath = os.path.join(self.path, "actions/"+actionname)
         return actionFullPath
-    
+
+    def init(self):
+        initFilename = os.path.join(self.path, "init")
+        self.config = ActionReader(initfilename)
+        print self.config
+        
     def execute(self, actionname):
         actionFilename = self.getActionFilename(actionname)
 
