@@ -44,14 +44,14 @@ class ProfileMatcher():
             return item[1]
 
         sorted_profiles = sorted(candidate_profiles, key=getKey, reverse=True)
-        print "CANDIDATE PROFILES"
-        for candidate in sorted_profiles: print candidate
+        #print "CANDIDATE PROFILES"
+        #for candidate in sorted_profiles: print candidate
 
-        if len(sorted_profiles)>0:
-            print "BEST CANDIDATE"
-            print sorted_profiles[0][0]
-        else:
-            print "No match found"
+        #if len(sorted_profiles)>0:
+        #    print "BEST CANDIDATE"
+        #    print sorted_profiles[0][0]
+        #else:
+        #    print "No match found"
 
         if len(sorted_profiles)>0:
             return sorted_profiles[0][0][1]
