@@ -39,10 +39,10 @@ function wsrobot_init(ip) {
             var b = document.createElement("input");
             //Assign different attributes to the element. 
             b.type = "button";
-            b.value = v[2]; 
+            b.value = v[3]; 
             b.name = v[2]; 
             b.id = v[2]; 
-            b.onclick = function(event) { button_fn(event,v[2]) };
+            b.onclick = function(event) { button_fn(event) };
             var bdiv = document.getElementById("buttons");
             bdiv.appendChild(b);
           }

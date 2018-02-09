@@ -16,6 +16,8 @@ sys.path.append('/home/iocchi/src/Pepper/pepper_tools/cmd_server')
 import pepper_cmd
 from pepper_cmd import *
 
+#from interaction_manager import InteractionManager
+import interaction_manager
 
 # Global variables
 
@@ -29,8 +31,8 @@ last_answer = None
 return_value = "OK"
 reset_answer = False        # Request to stop waiting for answers
 conn_client = None          # Connected client
-
-
+im = None                   # interaction manager
+display_ws = None            # display ws object
 
 
 RED   = "\033[1;31m"  
@@ -42,26 +44,16 @@ BOLD    = "\033[;1m"
 REVERSE = "\033[;7m"
 
 
-# Basic UI functions
-
-def websend(data):
-    global websocket_server
-    if websocket_server==None:
-        print "websocket server not connected"
-        return
-    try:
-        websocket_server.write_message(data)
-        #print(status)
-    except tornado.websocket.WebSocketClosedError:
-        #print('Connection closed.')
-        websocket_server = None
+# Settings functions
 
 def begin():
-    global code_running
+    global code_running, im, display_ws
     print "Start interaction"
     code_running = True
-    cancel_answer()
-    remove_buttons()
+    display_ws.cancel_answer()
+    display_ws.remove_buttons()
+    im = interaction_manager.InteractionManager(display_ws)
+    
     pepper_cmd.begin()
 
 def end():
@@ -69,56 +61,77 @@ def end():
     code_running = False
     pepper_cmd.end()
 
+# Basic UI functions
+
 # Export commands, must set global variable return_value
-def display_text(data):
-    global return_value
-    websend("display_text_"+data)
-    return_value = "OK"
+class DisplayWS:
 
-def display_image(data):
-    imgfile = "img/"+data+".jpg"
-    websend("display_image_"+imgfile)
+    def __init__(self):
+        self.websocket_server = None
+
+    def setws(self, websocket_server):
+        self.websocket_server = websocket_server
+    
+    def websend(self, data):
+        if (self.websocket_server == None):
+            print('DisplayWS: websocket not connected.')
+            return
+        try:
+            self.websocket_server.write_message(data)
+            #print(status)
+        except tornado.websocket.WebSocketClosedError:
+            print('DisplayWS: websocket connection error.')
+
+    def display_text(self, data):
+        global return_value
+        print "web send: " + "display_text_"+data
+        self.websend("display_text_"+data)
+        return_value = "OK"
+
+    def display_image(self, data):
+        self.websend("display_image_"+data)
 
 
-def display_imagebuttons(data): 
-    global last_answer, return_value
-    for d in data:
-        websend("display_imagebutton_"+d)
-    last_answer = None
-    return_value = "OK"
+    def display_imagebuttons(self, data): 
+        global last_answer, return_value
+        for d in data:
+            self.websend("display_imagebutton_"+d)
+        last_answer = None
+        return_value = "OK"
 
-def display_buttons(data): 
-    global last_answer, return_value
-    for d in data:
-        websend("display_button_"+d)
-    last_answer = None
-    return_value = "OK"
+    def display_buttons(self, data): 
+        global last_answer, return_value
+        for d in data:
+            self.websend("display_button_"+d[0]+"_"+d[1])
+        last_answer = None
+        return_value = "OK"
 
-def remove_buttons(): 
-    global return_value
-    websend("remove_buttons")
-    return_value = "OK"
+    def remove_buttons(self): 
+        global return_value
+        self.websend("remove_buttons")
+        return_value = "OK"
 
-def answer():
-    global last_answer, return_value, reset_answer
-    reset_answer = False
-    while (last_answer is None and not reset_answer):
-        time.sleep(0.5)
-        #print "Answer: ",last_answer
-    return_value = last_answer
-    return return_value
+    def answer(self):
+        global last_answer, return_value, reset_answer
+        reset_answer = False
+        while (last_answer is None and not reset_answer):
+            time.sleep(0.5)
+            #print "Answer: ",last_answer
+        return_value = last_answer
+        return return_value
 
-def cancel_answer():
-    global reset_answer
-    reset_answer = True
+    def cancel_answer(self):
+        global reset_answer
+        reset_answer = True
 
-def ask(data):
-    display_buttons(data)    
-    a = answer()
-    remove_buttons()
-    if (a is not None):
-        a = a.rstrip()
-    return a
+    def ask(self, data):
+        display_buttons(data)    
+        a = answer()
+        remove_buttons()
+        if (a is not None):
+            a = a.rstrip()
+        return a
+
 
 
 def sensorvalue(data):
@@ -147,9 +160,9 @@ def client_return():
 
 
 def ifreset(killthread=False):
-    global run_thread, code_running
-    cancel_answer()
-    websend("reload")
+    global run_thread, code_running, display_ws
+    display_ws.cancel_answer()
+    display_ws.websend("reload")
     time.sleep(0.5)
     client_return()
     if (killthread and code_running):
@@ -159,7 +172,7 @@ def ifreset(killthread=False):
 # Run the code
 
 def run_code(code):
-    global status, return_value, conn_client
+    global status, return_value, conn_client, im
     if (code is None):
         return
     print("=== Start code run ===")
@@ -184,12 +197,13 @@ def start_cmd_server(TCP_PORT):
     BUFFER_SIZE = 20000
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
         s.bind((TCP_IP,TCP_PORT))
         s.listen(1)
         run=True
     except:
-        print "GUI Program Server: bind error"
+        print RED+"GUI Program Server: bind error"+RESET
         run=False        
     
     while run:
@@ -223,7 +237,7 @@ def start_cmd_server(TCP_PORT):
             conn_client.close()
         print "Cmd server: end connection"
         ifreset(True)
-
+ 
 
 
 
@@ -232,9 +246,11 @@ def start_cmd_server(TCP_PORT):
 class MyWebSocketServer(tornado.websocket.WebSocketHandler):
 
     def open(self):
-        global websocket_server, run
+        global websocket_server, display_ws
         websocket_server = self
         print('New websocket connection')
+        print websocket_server
+        display_ws.setws(websocket_server)
        
     def on_message(self, message):
         global last_answer
@@ -258,15 +274,21 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         #print("-- Request from %s" %(origin))
         return True
 
-
-
+    def sendJS(self, data):
+        try:
+            self.write_message(data)
+            #print(status)
+        except tornado.websocket.WebSocketClosedError:
+            print(RED+'Web socket: connection error.'+RESET)
 
 
 
 
 # Main program
   
-if __name__ == "__main__":
+
+def main():
+    global display_ws
 
     ws_server_port = 9000
     cmd_server_port = 9100
@@ -281,6 +303,10 @@ if __name__ == "__main__":
         robotconnect()
     except RuntimeError:
         print(RED+"Cannot connect to robot"+RESET)
+
+    # Display object
+
+    display_ws = DisplayWS()
 
     # Run websocket server
     application = tornado.web.Application([
@@ -299,4 +325,8 @@ if __name__ == "__main__":
     run = False
     print("Waiting for main loop to quit...")
 
+
+
+if __name__ == "__main__":
+    main()
 
