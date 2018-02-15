@@ -224,6 +224,8 @@ def start_cmd_server(TCP_PORT):
         except KeyboardInterrupt:
             print "User quit."
             run = False
+        except:
+            run = False
         while connected:
             try:
                 data = conn_client.recv(BUFFER_SIZE)
@@ -300,10 +302,10 @@ def main():
     ws_server_port = 9100
     cmd_server_port = 9101
 
-	if (len(sys.argv)>1):
-		ws_server_port = int(sys.argv[1]);
-	if (len(sys.argv)>2):
-		cmd_server_port = int(sys.argv[1]);
+    if (len(sys.argv)>1):
+        ws_server_port = int(sys.argv[1]);
+    if (len(sys.argv)>2):
+        cmd_server_port = int(sys.argv[2]);
 
     # Run command server
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
