@@ -224,6 +224,8 @@ def start_cmd_server(TCP_PORT):
         except KeyboardInterrupt:
             print "User quit."
             run = False
+        except socket.timeout:
+            pass
         except:
             run = False
         while connected:
@@ -312,12 +314,12 @@ def main():
     t.start()
 
     # Connection to robot
-    print "Connecting to Pepper robot..."
+    print("Connecting to Pepper robot...")
     try:
         robotconnect()
     except RuntimeError:
         print(RED+"Cannot connect to robot"+RESET)
-    print "Connected to Pepper robot"
+    print("%sConnected to Pepper robot%s" %(GREEN,RESET))
 
     # Display object
 
