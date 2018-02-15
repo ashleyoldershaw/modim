@@ -297,7 +297,7 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
   
 
 def main():
-    global display_ws
+    global display_ws, run
 
     ws_server_port = 9100
     cmd_server_port = 9101
@@ -317,6 +317,7 @@ def main():
         robotconnect()
     except RuntimeError:
         print(RED+"Cannot connect to robot"+RESET)
+    print "Connected to Pepper robot"
 
     # Display object
 

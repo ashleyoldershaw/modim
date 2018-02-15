@@ -28,6 +28,7 @@ def setServerAddr(ip, port):
 
 def cconnect():
     global csock,server_ip,server_port
+    print ("Client connecting to %s:%d" %(server_ip, server_port))
     csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     csock.connect((server_ip,server_port))
 
