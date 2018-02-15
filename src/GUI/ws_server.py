@@ -204,7 +204,7 @@ def start_cmd_server(TCP_PORT):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.settimeout(3)re
+    s.settimeout(3)
     try:
         s.bind((TCP_IP,TCP_PORT))
         s.listen(1)
