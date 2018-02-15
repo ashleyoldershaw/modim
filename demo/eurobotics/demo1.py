@@ -16,6 +16,7 @@ def interaction():
     im.setProfile(['*', '*', 'es', '*'])
     im.setPath('../../demo/eurobotics/')
 
+    showurl('demo/eurobotics/index.html')
 
     im.executeModality("IMAGE","img/diaglogo.jpg")
 

@@ -43,10 +43,10 @@ def csendfile(program):
     print "Sending program...",
     csock.send(data)
 
-    print(" done")
+    print("done")
 
     rdata = csock.recv(BUFFER_SIZE)
-    print "Reply: ",rdata
+    print("Reply: %s" %rdata)
 
 
 def csend(data):
