@@ -4,6 +4,7 @@
 import sys
 import socket
 import time
+import os
 #from threading import Thread
 from thread2 import Thread
 
@@ -12,7 +13,9 @@ import tornado.websocket
 import tornado.ioloop
 import tornado.web
 
-sys.path.append('/home/iocchi/src/Pepper/pepper_tools/cmd_server')
+pepper_tools_dir = os.getenv("PEPPER_TOOLS_HOME")
+
+sys.path.append(pepper_tools_dir+'/cmd_server')
 import pepper_cmd
 from pepper_cmd import *
 
@@ -24,7 +27,6 @@ import interaction_manager
 websocket_server = None     # websocket handler
 run = True                  # main_loop run flag
 run_thread = None           # thread running the code
-server_port = 9000          # web server port
 code_running = False        # code running
 status = "Idle"             # robot status sent to websocket
 last_answer = None
@@ -54,7 +56,8 @@ def begin():
     display_ws.remove_buttons()
     im = interaction_manager.InteractionManager(display_ws)
     
-    pepper_cmd.begin()
+    # TODO:: if robot_enabled:
+    #pepper_cmd.begin()
 
 def end():
     global code_running
@@ -162,13 +165,16 @@ def client_return():
 def ifreset(killthread=False):
     global run_thread, code_running, display_ws
     display_ws.cancel_answer()
-    display_ws.websend("reload")
+    #display_ws.websend("reload")
     time.sleep(0.5)
     client_return()
     if (killthread and code_running):
         run_thread.terminate()
         print "Run code thread: ",run_thread," terminated."
         code_running = False
+
+
+
 # Run the code
 
 def run_code(code):
@@ -198,6 +204,7 @@ def start_cmd_server(TCP_PORT):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.settimeout(3)re
     try:
         s.bind((TCP_IP,TCP_PORT))
         s.listen(1)
@@ -290,8 +297,13 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
 def main():
     global display_ws
 
-    ws_server_port = 9000
-    cmd_server_port = 9100
+    ws_server_port = 9100
+    cmd_server_port = 9101
+
+	if (len(sys.argv)>1):
+		ws_server_port = int(sys.argv[1]);
+	if (len(sys.argv)>2):
+		cmd_server_port = int(sys.argv[1]);
 
     # Run command server
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
@@ -312,7 +324,7 @@ def main():
     application = tornado.web.Application([
         (r'/websocketserver', MyWebSocketServer),])  
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(server_port)
+    http_server.listen(ws_server_port)
     print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
     try:
         tornado.ioloop.IOLoop.instance().start()

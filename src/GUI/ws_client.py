@@ -21,6 +21,11 @@ def setDemoDir(ddir):
     global demodir
     demodir = ddir
 
+def setServerAddr(ip, port):
+    global server_ip, server_port
+    server_ip = ip
+    server_port = port
+
 def cconnect():
     global csock,server_ip,server_port
     csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

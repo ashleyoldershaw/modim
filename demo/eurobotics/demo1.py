@@ -4,6 +4,11 @@ import time
 sys.path.append('../../src/GUI')
 from ws_client import *
 
+pepper_ip = '192.168.1.134' # ethernet
+pepper_port = 9101
+
+setServerAddr(pepper_ip, pepper_port)
+
 def interaction():
     begin()
 
@@ -11,13 +16,17 @@ def interaction():
     im.setProfile(['*', '*', 'es', '*'])
     im.setPath('../../demo/eurobotics/')
 
+
+    im.executeModality("IMAGE","img/diaglogo.jpg")
+
+    time.sleep(3)
     # im.init()
 
 
     a = im.ask('animal')
     print a
 
-    say("You have selected "+a)
+    #asay("You have selected "+a)
 
     im.executeModality("TEXT","Hai scelto "+a)
 
@@ -25,9 +34,7 @@ def interaction():
     
     im.execute(a)
 
-    time.sleep(3)
-
-
+    time.sleep(5)
 
     end()
 
