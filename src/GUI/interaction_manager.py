@@ -27,7 +27,7 @@ class InteractionManager:
 
     def init(self):
         initFilename = os.path.join(self.path, "init")
-        self.config = ActionReader(initfilename)
+        self.config = ActionReader(initFilename)
         print self.config
         
     def execute(self, actionname):
@@ -47,25 +47,29 @@ class InteractionManager:
 
     def ask(self, actionname):
         self.execute(actionname)
-        a = self.display.answer()
-        self.display.remove_buttons()
-        if (a is not None):
-            a = a.rstrip()
-        return a
+        if self.display != None:
+            a = self.display.answer()
+            self.display.remove_buttons()
+            if (a is not None):
+                a = a.rstrip()
+            return a
 
 
     def executeModality(self, modality, interaction):
         if modality == 'TEXT':
             print 'display_text('+str(interaction)+')'
-            self.display.display_text(interaction)
+            if self.display != None:
+                self.display.display_text(interaction)
 
         elif modality == 'IMAGE':
             print 'display_image('+interaction+')'
-            self.display.display_image(interaction)
+            if self.display != None:
+                self.display.display_image(interaction)
 
         elif modality == 'BUTTONS':
             print 'display_buttons('+str(interaction)+')'
-            self.display.display_buttons(interaction)
+            if self.display != None:
+                self.display.display_buttons(interaction)
 
         elif modality == 'ASRCMD':
             print 'send_command_speech('+interaction+')'
