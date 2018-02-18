@@ -5,6 +5,7 @@ import sys
 import socket
 import time
 import os
+import argparse
 #from threading import Thread
 from thread2 import Thread
 
@@ -42,19 +43,6 @@ display_ws = None           # display ws object
 robot_type = None           # None, pepper, marrtino, ...
 robot_initialized = False   # if robot has been initialized
 
-
-
-# Import
-
-if (robot_type=='pepper'):
-    try:
-        pepper_tools_dir = os.getenv("PEPPER_TOOLS_HOME")
-        sys.path.append(pepper_tools_dir+'/cmd_server')
-        import pepper_cmd
-        from pepper_cmd import *
-    except:
-        print("%sSet environment_variable PEPPER_TOOLS_HOME to pepper_tools directory.%s" %(RED,RESET))
-        sys.exit(0)
 
 
 # Settings functions
@@ -328,16 +316,39 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
 # Main program
   
 
-def main():
-    global display_ws, run
 
-    ws_server_port = 9100
-    cmd_server_port = 9101
 
-    if (len(sys.argv)>1):
-        ws_server_port = int(sys.argv[1]);
-    if (len(sys.argv)>2):
-        cmd_server_port = int(sys.argv[2]);
+
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-wsport", type=str, default=9100,
+                        help="WS Server port.")
+    parser.add_argument("-cmdport", type=int, default=9101,
+                        help="Command Server port")
+    parser.add_argument("-robot", type=str, default=None,
+                        help="Robot type [None, pepper, marrtino]")
+
+    args = parser.parse_args()
+
+    ws_server_port = args.wsport
+    cmd_server_port = args.cmdport
+    robot_type = args.robot
+
+    if (robot_type=='pepper'):
+        try:
+            pepper_tools_dir = os.getenv("PEPPER_TOOLS_HOME")
+            sys.path.append(pepper_tools_dir+'/cmd_server')
+            import pepper_cmd
+            from pepper_cmd import *
+        except:
+            print("%sSet environment_variable PEPPER_TOOLS_HOME to pepper_tools directory.%s" %(RED,RESET))
+            sys.exit(0)
+    if (robot_type=='marrtino'):
+        print("%sTODO: marrtino import...%s" %(RED,RESET))
+        sys.exit(0)
 
     # Run command server
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
@@ -363,8 +374,4 @@ def main():
     run = False
     print("Waiting for main loop to quit...")
 
-
-
-if __name__ == "__main__":
-    main()
 
