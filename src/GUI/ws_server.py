@@ -53,19 +53,11 @@ def init_robot():
     if (not robot_initialized): 
         if (robot_type=='pepper'):
             # Connection to robot
-            print("Connecting to Pepper robot...")
-            try:
-                pepper_cmd.robotconnect()
-            except RuntimeError:
-                print(RED+"Cannot connect to robot"+RESET)
-            print("%sConnected to Pepper robot%s" %(GREEN,RESET))
-
-            pepper_cmd.begin()
-            robot_initialized = False
+            if pepper_cmd.robotconnect():
+                robot_initialized = True
         elif (robot_type=='marrtino'):
-            print("%sTODO marrtino initialization.%s" %(RED,RESET))
-            sys.exit(0)
-    
+            pass    
+
 
 
 def begin():
@@ -75,12 +67,19 @@ def begin():
     display_ws.cancel_answer()
     display_ws.remove_buttons()
     im = interaction_manager.InteractionManager(display_ws)
-    init_robot()    
+    if (robot_type=='pepper'):
+        pepper_cmd.begin()
+    elif (robot_type=='marrtino'):
+        robot_cmd_ros.begin()
 
 def end():
     global code_running
     code_running = False
-    pepper_cmd.end()
+    if (robot_type=='pepper'):
+        pepper_cmd.end()
+    elif (robot_type=='marrtino'):
+        robot_cmd_ros.end()
+
 
 # Basic UI functions
 
@@ -346,9 +345,17 @@ if __name__ == "__main__":
         except:
             print("%sSet environment_variable PEPPER_TOOLS_HOME to pepper_tools directory.%s" %(RED,RESET))
             sys.exit(0)
-    if (robot_type=='marrtino'):
-        print("%sTODO: marrtino import...%s" %(RED,RESET))
-        sys.exit(0)
+    elif (robot_type=='marrtino'):
+        try:
+            marrtino_apps_dir = os.getenv("MARRTINO_APPS_HOME")
+            sys.path.append(marrtino_apps_dir+'/program')
+            import robot_cmd_ros
+            from robot_cmd_ros import *
+        except:
+            print("%sSet environment_variable MARRTINO_APPS_HOME to marrtino_apps directory.%s" %(RED,RESET))
+            sys.exit(0)
+
+
 
     # Run command server
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
@@ -363,6 +370,11 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(ws_server_port)
     print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
+
+    # Init robot
+    init_robot()    
+
+    # Start websocket server
     try:
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
