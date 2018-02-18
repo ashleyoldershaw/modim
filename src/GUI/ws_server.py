@@ -13,11 +13,15 @@ import tornado.websocket
 import tornado.ioloop
 import tornado.web
 
-pepper_tools_dir = os.getenv("PEPPER_TOOLS_HOME")
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
 
-sys.path.append(pepper_tools_dir+'/cmd_server')
-import pepper_cmd
-from pepper_cmd import *
+
 
 #from interaction_manager import InteractionManager
 import interaction_manager
@@ -34,19 +38,47 @@ return_value = "OK"
 reset_answer = False        # Request to stop waiting for answers
 conn_client = None          # Connected client
 im = None                   # interaction manager
-display_ws = None            # display ws object
+display_ws = None           # display ws object
+robot_type = None           # None, pepper, marrtino, ...
+robot_initialized = False   # if robot has been initialized
 
 
-RED   = "\033[1;31m"  
-BLUE  = "\033[1;34m"
-CYAN  = "\033[1;36m"
-GREEN = "\033[0;32m"
-RESET = "\033[0;0m"
-BOLD    = "\033[;1m"
-REVERSE = "\033[;7m"
+
+# Import
+
+if (robot_type=='pepper'):
+    try:
+        pepper_tools_dir = os.getenv("PEPPER_TOOLS_HOME")
+        sys.path.append(pepper_tools_dir+'/cmd_server')
+        import pepper_cmd
+        from pepper_cmd import *
+    except:
+        print("%sSet environment_variable PEPPER_TOOLS_HOME to pepper_tools directory.%s" %(RED,RESET))
+        sys.exit(0)
 
 
 # Settings functions
+
+def init_robot():
+    global robot_type, robot_initialized
+
+    if (not robot_initialized): 
+        if (robot_type=='pepper'):
+            # Connection to robot
+            print("Connecting to Pepper robot...")
+            try:
+                pepper_cmd.robotconnect()
+            except RuntimeError:
+                print(RED+"Cannot connect to robot"+RESET)
+            print("%sConnected to Pepper robot%s" %(GREEN,RESET))
+
+            pepper_cmd.begin()
+            robot_initialized = False
+        elif (robot_type=='marrtino'):
+            print("%sTODO marrtino initialization.%s" %(RED,RESET))
+            sys.exit(0)
+    
+
 
 def begin():
     global code_running, im, display_ws
@@ -55,9 +87,7 @@ def begin():
     display_ws.cancel_answer()
     display_ws.remove_buttons()
     im = interaction_manager.InteractionManager(display_ws)
-    
-    # TODO:: if robot_enabled:
-    #pepper_cmd.begin()
+    init_robot()    
 
 def end():
     global code_running
@@ -313,16 +343,7 @@ def main():
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
     t.start()
 
-    # Connection to robot
-    print("Connecting to Pepper robot...")
-    try:
-        robotconnect()
-    except RuntimeError:
-        print(RED+"Cannot connect to robot"+RESET)
-    print("%sConnected to Pepper robot%s" %(GREEN,RESET))
-
     # Display object
-
     display_ws = DisplayWS()
 
     # Run websocket server

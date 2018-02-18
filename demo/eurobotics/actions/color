@@ -1,3 +1,6 @@
+IMAGE
+<*, *, *, *>:  "img/rainbow.jpg"
+----
 TEXT
 <*,*,*,*>:"What is your favourite color?"
 ----
