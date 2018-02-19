@@ -1,3 +1,6 @@
+IMAGE
+<*, *, *, *>:  "img/animals.jpg"
+----
 TEXT
 <*,*,*,*>:"What is your favourite animal?"
 ----
