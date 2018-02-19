@@ -59,26 +59,22 @@ def init_robot():
             pass    
 
 
-
-def begin():
-    global code_running, im, display_ws
-    print "Start interaction"
-    code_running = True
+def init_interaction_manager():
+    global im, display_ws
+    print "Start interaction manager"
+    display_ws = DisplayWS()
     display_ws.cancel_answer()
     display_ws.remove_buttons()
     im = interaction_manager.InteractionManager(display_ws)
-    if (robot_type=='pepper'):
-        pepper_cmd.begin()
-    elif (robot_type=='marrtino'):
-        robot_cmd_ros.begin()
+
+
+def begin():
+    # Note: this function is replaced by from <robot>_cmd import *
+    print "WS begin"
 
 def end():
-    global code_running
-    code_running = False
-    if (robot_type=='pepper'):
-        pepper_cmd.end()
-    elif (robot_type=='marrtino'):
-        robot_cmd_ros.end()
+    # Note: this function is replaced by from <robot>_cmd import *
+    print "WS end"
 
 
 # Basic UI functions
@@ -94,13 +90,13 @@ class DisplayWS:
     
     def websend(self, data):
         if (self.websocket_server == None):
-            print('DisplayWS: websocket not connected.')
+            print('%sDisplayWS: websocket not connected.%s' %(RED,RESET))
             return
         try:
             self.websocket_server.write_message(data)
             #print(status)
         except tornado.websocket.WebSocketClosedError:
-            print('DisplayWS: websocket connection error.')
+            print('%sDisplayWS: websocket connection error.%s' %(RED,RESET))
 
     def display_text(self, data):
         global return_value
@@ -169,7 +165,7 @@ def sensorvalue(data):
 
 
 def client_return():
-    global conn_client
+    global conn_client, return_value
     if (conn_client is None):
         return
     try:
@@ -195,15 +191,18 @@ def ifreset(killthread=False):
 # Run the code
 
 def run_code(code):
-    global status, return_value, conn_client, im
+    global status, return_value, conn_client, im, code_running
     if (code is None):
         return
-    print("=== Start code run ===")
     print("Executing")
     print(code)
+
+    print("=== Start code run ===")
     try:
         status = "Executing program"
+        code_running = True
         exec(code)
+        code_running = False
     except Exception as e:
         print("CODE EXECUTION ERROR")
         print e
@@ -261,10 +260,12 @@ def start_cmd_server(TCP_PORT):
             #run_code(data)
             #conn.send("%s\n" %return_value)
 
+        ifreset(True)
         if (conn_client is not None):
             conn_client.close()
+            conn_client = None
         print "Cmd server: end connection"
-        ifreset(True)
+        
  
 
 
@@ -361,8 +362,8 @@ if __name__ == "__main__":
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
     t.start()
 
-    # Display object
-    display_ws = DisplayWS()
+    # Display object and IM
+    init_interaction_manager()
 
     # Run websocket server
     application = tornado.web.Application([

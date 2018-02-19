@@ -11,7 +11,7 @@ import inspect
 import textwrap
 
 server_ip = '127.0.0.1'
-server_port = 9100
+server_port = 9101
 csock = None
 
 
@@ -28,9 +28,11 @@ def setServerAddr(ip, port):
 
 def cconnect():
     global csock,server_ip,server_port
-    print ("Client connecting to %s:%d" %(server_ip, server_port))
+    print ("WS client:: connecting to %s:%d ..." %(server_ip, server_port))
     csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     csock.connect((server_ip,server_port))
+    print ("WS client:: connected to %s:%d" %(server_ip, server_port))
+
 
 def csendfile(program):
     global csock
@@ -54,14 +56,19 @@ def csend(data):
     global csock
     if csock==None:
         cconnect()
+    print ("WS client:: sending data ...")
     csock.send(data)
+    print ("WS client:: data sent")
+
     time.sleep(0.5)
+
+    print ("WS client:: waiting for reply ...")
     try:
         rdata = csock.recv(200)
     except KeyboardInterrupt:
         rdata = "user quit"
-    return rdata
     print "Reply: ",rdata
+    return rdata
 
 def cclose():
     global csock
@@ -96,7 +103,7 @@ def main():
     program = args.program
 
     #Starting application
-    start_client(server_ip,server_port,program)
+    #start_client(server_ip,server_port,program)
     
 
 
