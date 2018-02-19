@@ -68,6 +68,16 @@ def init_interaction_manager():
     im = interaction_manager.InteractionManager(display_ws)
 
 
+
+def init_GUI(robot_type,url):
+    # run in a separate thread (started before wssocket start, so it must wait before connection)
+    time.sleep(3)
+    if (robot_type=='pepper' and url != None):
+        pepper_cmd.showurl(args.url)
+
+
+
+
 def begin():
     # Note: this function is replaced by from <robot>_cmd import *
     print "WS begin"
@@ -314,12 +324,6 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
 
 
 # Main program
-  
-
-
-
-
-
 
 if __name__ == "__main__":
 
@@ -330,6 +334,8 @@ if __name__ == "__main__":
                         help="Command Server port")
     parser.add_argument("-robot", type=str, default=None,
                         help="Robot type [None, pepper, marrtino]")
+    parser.add_argument("-url", type=str, default=None,
+                        help="URL of main HTML file")
 
     args = parser.parse_args()
 
@@ -343,7 +349,8 @@ if __name__ == "__main__":
             sys.path.append(pepper_tools_dir+'/cmd_server')
             import pepper_cmd
             from pepper_cmd import *
-        except:
+        except Exception as e:
+            print e
             print("%sSet environment_variable PEPPER_TOOLS_HOME to pepper_tools directory.%s" %(RED,RESET))
             sys.exit(0)
     elif (robot_type=='marrtino'):
@@ -374,6 +381,10 @@ if __name__ == "__main__":
 
     # Init robot
     init_robot()    
+
+    # Init GUI
+    t_initgui = Thread(target=init_GUI, args=(robot_type, args.url,))
+    t_initgui.start()
 
     # Start websocket server
     try:
