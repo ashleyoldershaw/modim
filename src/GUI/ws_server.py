@@ -336,8 +336,10 @@ def main():
     except KeyboardInterrupt:
         print(" -- Keyboard interrupt --")
 
-    if (not websocket_server is None):
+    try:
         websocket_server.close()
+    except:
+        pass
     print("Web server quit.")
     run = False
     print("Waiting for main loop to quit...")
