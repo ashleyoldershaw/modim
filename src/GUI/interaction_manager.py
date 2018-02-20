@@ -56,15 +56,23 @@ class InteractionManager:
 
 
     def executeModality(self, modality, interaction):
-        if modality == 'TEXT':
-            print 'display_text('+str(interaction)+')'
+        if modality.startswith('TEXT'):
+            vmod = modality.split('_')
+            place = 'default'
+            if (len(vmod)>1):
+                place = vmod[1]
+            print 'display_text('+str(interaction)+','+place+')'
             if self.display != None:
-                self.display.display_text(interaction)
+                self.display.display_text(interaction, place)
 
-        elif modality == 'IMAGE':
-            print 'display_image('+interaction+')'
+        elif modality.startswith('IMAGE'):
+            vmod = modality.split('_')
+            place = 'default'
+            if (len(vmod)>1):
+                place = vmod[1]
+            print 'display_image('+str(interaction)+','+place+')'
             if self.display != None:
-                self.display.display_image(interaction)
+                self.display.display_image(interaction, place)
 
         elif modality == 'BUTTONS':
             print 'display_buttons('+str(interaction)+')'

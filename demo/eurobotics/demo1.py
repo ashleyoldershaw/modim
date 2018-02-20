@@ -1,5 +1,6 @@
 import sys
 import time
+import os
 
 sys.path.append('../../src/GUI')
 from ws_client import *
@@ -75,6 +76,7 @@ def itest():
     time.sleep(3)
     display_text("Arrivederci")
     end()
+
 
 run_interaction(i2)
 

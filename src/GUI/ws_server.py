@@ -108,15 +108,19 @@ class DisplayWS:
         except tornado.websocket.WebSocketClosedError:
             print('%sDisplayWS: websocket connection error.%s' %(RED,RESET))
 
-    def display_text(self, data):
+    def display_text(self, data, place):
         global return_value
-        print "web send: " + "display_text_"+data
-        self.websend("display_text_"+data)
+        cmdsend = "display_text_"+place+"_"+data
+        print "web send: " + cmdsend
+        self.websend(cmdsend)
         return_value = "OK"
 
-    def display_image(self, data):
-        self.websend("display_image_"+data)
-
+    def display_image(self, data, place='default'):
+        global return_value
+        cmdsend = "display_image_"+place+"_"+data
+        print "web send: " + cmdsend
+        self.websend(cmdsend)
+        return_value = "OK"
 
     def display_imagebuttons(self, data): 
         global last_answer, return_value
@@ -158,6 +162,12 @@ class DisplayWS:
             a = a.rstrip()
         return a
 
+    def loadUrl(self, data):
+        global return_value
+        cmdsend = "url_"+data
+        print "web send: " + cmdsend
+        self.websend(cmdsend)
+        return_value = "OK"
 
 
 def sensorvalue(data):
@@ -270,7 +280,8 @@ def start_cmd_server(TCP_PORT):
             #run_code(data)
             #conn.send("%s\n" %return_value)
 
-        ifreset(True)
+        #TODO Only if not asked explict load URL        
+        #ifreset(True)
         if (conn_client is not None):
             conn_client.close()
             conn_client = None
@@ -300,7 +311,8 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
   
     def on_close(self):
         print(RED+'Websocket: connection closed'+RESET)
-        ifreset(True)
+        #TODO Only if not asked explict load URL 
+        #ifreset(True)
         websocket_server = None
   
     def on_ping(self, data):

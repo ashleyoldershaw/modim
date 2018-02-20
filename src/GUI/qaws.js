@@ -18,8 +18,8 @@ function wsrobot_connected() {
   return connected;
 }
 
-function wsrobot_init(ip) {
-    var url = "ws://"+ip+":9000/websocketserver";
+function wsrobot_init(ip, port) {
+    var url = "ws://"+ip+":"+port+"/websocketserver";
     console.log(url);
     websocket = new WebSocket(url);
 
@@ -28,18 +28,25 @@ function wsrobot_init(ip) {
       v = event.data.split('_');
       if (v[0]=='display') {
           if (v[1]=='text')
-              document.getElementById("text").innerHTML = v[2];
+              document.getElementById(v[1]+'_'+v[2]).innerHTML = v[3];
           else if (v[1]=='image')
-              document.getElementById("image").src = v[2];
+              document.getElementById(v[1]+'_'+v[2]).src = v[3];
           else if (v[1]=='button') {
-
             var b = document.createElement("input");
             //Assign different attributes to the element. 
-            b.type = "button";
-            b.value = v[2]; 
+
+            if (v[3].startsWith('img')) {
+                b.type = "image";
+                b.src = v[3];
+            }
+            else {
+                b.type = "button";
+                b.value = v[3]; 
+            }
+
             b.name = v[2]; 
             b.id = v[2]; 
-            b.onclick = function(event) { button_fn(event,'XXX'+v[2]) };
+            b.onclick = function(event) { button_fn(event) };
             var bdiv = document.getElementById("buttons");
             bdiv.appendChild(b);
           }
@@ -54,6 +61,10 @@ function wsrobot_init(ip) {
                 }
 
             }
+        }
+        else if (v[0]=='url') {
+            console.log('load url: '+v[1])
+            window.location.assign(v[1])
         }
     } 
 

@@ -14,13 +14,6 @@ server_ip = '127.0.0.1'
 server_port = 9101
 csock = None
 
-
-demodir = '../../demo/eurobotics'
-
-def setDemoDir(ddir):
-    global demodir
-    demodir = ddir
-
 def setServerAddr(ip, port):
     global server_ip, server_port
     server_ip = ip

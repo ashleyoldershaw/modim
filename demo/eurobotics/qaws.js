@@ -27,19 +27,23 @@ function wsrobot_init(ip, port) {
       console.log("message received: "+event.data);
       v = event.data.split('_');
       if (v[0]=='display') {
-          if (v[1]=='text') {
-              document.getElementById("text").innerHTML = v[2];
-          }
-          else if (v[1]=='image')  {
-              document.getElementById("image").src = v[2];
-              console.log('image: '+v[2]);
-          }
+          if (v[1]=='text')
+              document.getElementById(v[1]+'_'+v[2]).innerHTML = v[3];
+          else if (v[1]=='image')
+              document.getElementById(v[1]+'_'+v[2]).src = v[3];
           else if (v[1]=='button') {
-
             var b = document.createElement("input");
             //Assign different attributes to the element. 
-            b.type = "button";
-            b.value = v[3]; 
+
+            if (v[3].startsWith('img')) {
+                b.type = "image";
+                b.src = v[3];
+            }
+            else {
+                b.type = "button";
+                b.value = v[3]; 
+            }
+
             b.name = v[2]; 
             b.id = v[2]; 
             b.onclick = function(event) { button_fn(event) };
@@ -58,8 +62,9 @@ function wsrobot_init(ip, port) {
 
             }
         }
-        else if (v[0]=='reload') {
-            location.reload();
+        else if (v[0]=='url') {
+            console.log('load url: '+v[1])
+            window.location.assign(v[1])
         }
     } 
 
