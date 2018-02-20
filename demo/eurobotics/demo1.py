@@ -50,13 +50,13 @@ def i2():
 
     im.execute('welcome')
 
-    time.sleep(5)
+    time.sleep(3)
 
     a = im.ask('color')
 
     im.execute(a)
 
-    time.sleep(5)
+    time.sleep(3)
 
     im.execute('goodbye')
 
