@@ -1,5 +1,5 @@
 TEXT: Welcome to DIAG
-IMAGE_LEFT: img/diag_logo.jpg
-IMGAGE_RIGHT: img/logo_eurobotics_week.png
+IMAGE_LEFT: img/diaglogo.jpg
+IMGAGE_RIGHT: img/logoeuroboticsweek.png
 PROFILE: <*,*,*,*>
 MULTILANG: NO

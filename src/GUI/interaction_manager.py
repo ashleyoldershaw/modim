@@ -10,11 +10,12 @@ from profileMatcher import ProfileMatcher
 import threading
 
 class InteractionManager:
-    def __init__(self, display):
+    def __init__(self, display, robot):
         self.profile =  ['*', '*', '*', '*']
         self.path = '.'
         self.config = []
         self.display = display
+        self.robot = robot
         
     def setProfile(self, profile):
         self.profile = profile
@@ -97,9 +98,13 @@ class InteractionManager:
 
         elif modality == 'GESTURE':
             print 'run_animation('+interaction+')'
+            if (self.robot != None):
+                self.robot.animation(interaction)
 
         elif modality == "TTS":
-            print 'run_say('+interaction+')'            
+            print 'say('+interaction+')'            
+            if (self.robot != None):
+                self.robot.say(interaction)
 
         print "Finished executeModality("+modality+","+str(interaction)+")\n"
 

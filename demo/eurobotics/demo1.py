@@ -78,5 +78,19 @@ def itest():
     end()
 
 
-run_interaction(i2)
+def i4():
+
+    im.setProfile(['*', '*', 'en', '*'])
+    im.setPath('../../demo/eurobotics/')
+    
+    im.init()
+
+    time.sleep(4)
+    # im.executeModality("TTS","ciao")
+    im.execute("welcome")
+
+    print "end speech"
+
+
+run_interaction(i4)
 

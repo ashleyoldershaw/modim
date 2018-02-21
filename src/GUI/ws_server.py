@@ -47,25 +47,25 @@ robot_initialized = False   # if robot has been initialized
 
 # Settings functions
 
-def init_robot():
-    global robot_type, robot_initialized
-
-    if (not robot_initialized): 
-        if (robot_type=='pepper'):
-            # Connection to robot
-            if pepper_cmd.robotconnect():
-                robot_initialized = True
-        elif (robot_type=='marrtino'):
-            pass    
-
 
 def init_interaction_manager():
-    global im, display_ws
+    global robot_type, robot_initialized, im, display_ws
     print "Start interaction manager"
+    print "  -- display init --"
     display_ws = DisplayWS()
     display_ws.cancel_answer()
     display_ws.remove_buttons()
-    im = interaction_manager.InteractionManager(display_ws)
+    print "  -- robot init --"
+    robot = None
+    if (not robot_initialized): 
+        if (robot_type=='pepper'):
+            # Connection to robot
+            robot = pepper_cmd.PepperRobot()
+            if robot.connect():
+                robot_initialized = True
+        elif (robot_type=='marrtino'):
+            pass  
+    im = interaction_manager.InteractionManager(display_ws, robot)
 
 
 
@@ -381,7 +381,7 @@ if __name__ == "__main__":
     t = Thread(target=start_cmd_server, args=(cmd_server_port,))
     t.start()
 
-    # Display object and IM
+    # Init robot display object and IM
     init_interaction_manager()
 
     # Run websocket server
@@ -391,8 +391,6 @@ if __name__ == "__main__":
     http_server.listen(ws_server_port)
     print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
 
-    # Init robot
-    init_robot()    
 
     # Init GUI
     t_initgui = Thread(target=init_GUI, args=(robot_type, args.url,))
