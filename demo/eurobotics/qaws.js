@@ -35,7 +35,7 @@ function wsrobot_init(ip, port) {
             var b = document.createElement("input");
             //Assign different attributes to the element. 
 
-            if (v[3].startsWith('img')) {
+            if (v[3].substr(0,3)=='img') {
                 b.type = "image";
                 b.src = v[3];
             }

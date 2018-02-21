@@ -9,9 +9,9 @@ from ws_client import *
 
 pepper_ip = '192.168.130.27' # wireless
 pepper_port = 9101
-#setServerAddr(pepper_ip, pepper_port)
+setServerAddr(pepper_ip, pepper_port)
 
-setServerAddr('127.0.0.1', 9101)
+#setServerAddr('127.0.0.1', 9101)
 
 def i1():
     begin()
@@ -92,7 +92,7 @@ def i4():
 
     im.execute("welcome")
 
-    time.sleep(3)
+    time.sleep(1)
 
     q = random.choice(['animal','color'])
 
@@ -105,5 +105,18 @@ def i4():
     im.execute('goodbye')
 
 
-run_interaction(i4)
+def i5():
+
+    #im.init()
+
+    time.sleep(3)
+
+    im.executeModality("TEXT",'Green')
+    im.executeModality("BUTTONS",[('green', 'img/cat.jpg'),('red','Red')])
+
+    time.sleep(3)
+    im.executeModality("TEXT",'')
+
+
+run_interaction(i1)
 
