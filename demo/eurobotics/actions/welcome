@@ -4,3 +4,6 @@ TEXT
 GESTURE
 <*,*,*,*>: animations/Stand/Gestures/Hey_1
 ----
+TTS
+<*,*,*,*>:"Welcome!"
+----

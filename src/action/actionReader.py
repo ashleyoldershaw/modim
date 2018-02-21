@@ -36,7 +36,12 @@ class ActionReader(dict):
         for line in self.actionFile.readlines():
             line = line.replace("\"","").strip(" \t\n")
             if len(line) > 0 and line[0] != '#': #comment or empty line
-                if (line.startswith("TEXT") or line == "BUTTONS" or line == "ASRCMD" or line.startswith("IMAGE") or line == "GESTURE"):
+                if (line.startswith("TEXT") or
+                    line.startswith("IMAGE") or
+                    line == "BUTTONS" or
+                    line == "TTS" or
+                    line == "ASRCMD" or
+                    line == "GESTURE"):
                     #starting section
                     sectionType = line
                     continue
@@ -51,7 +56,11 @@ class ActionReader(dict):
         print self
         
     def parseSectionRules(self, sectionType, sectionRules):
-        if (sectionType.startswith("TEXT") or sectionType == "ASRCMD" or sectionType.startswith("IMAGE") or sectionType == "GESTURE"):
+        if (sectionType.startswith("TEXT") or
+            sectionType.startswith("IMAGE") or
+            sectionType == "ASRCMD" or
+            sectionType == "TTS" or
+            sectionType == "GESTURE"):
             ruleList = []
             for rule in sectionRules:
                 parsedRule = self.parseRule(rule)

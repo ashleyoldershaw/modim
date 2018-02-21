@@ -98,6 +98,9 @@ class InteractionManager:
         elif modality == 'GESTURE':
             print 'run_animation('+interaction+')'
 
+        elif modality == "TTS":
+            print 'run_say('+interaction+')'            
+
         print "Finished executeModality("+modality+","+str(interaction)+")\n"
 
 if __name__ == "__main__":
