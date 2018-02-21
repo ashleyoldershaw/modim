@@ -6,7 +6,9 @@ sys.path.append('../../src/GUI')
 from ws_client import *
 
 #pepper_ip = '192.168.1.134' # ethernet
-#pepper_port = 9101
+
+pepper_ip = '192.168.130.27' # wireless
+pepper_port = 9101
 #setServerAddr(pepper_ip, pepper_port)
 
 setServerAddr('127.0.0.1', 9101)
@@ -80,16 +82,27 @@ def itest():
 
 def i4():
 
-    im.setProfile(['*', '*', 'en', '*'])
+    im.setProfile(['*', '*', '*', '*'])
     im.setPath('../../demo/eurobotics/')
     
     im.init()
 
-    time.sleep(4)
-    # im.executeModality("TTS","ciao")
+    # event
+    time.sleep(5)
+
     im.execute("welcome")
 
-    print "end speech"
+    time.sleep(3)
+
+    q = random.choice(['animal','color'])
+
+    a = im.ask(q)
+
+    im.execute(a)
+
+    time.sleep(3)
+
+    im.execute('goodbye')
 
 
 run_interaction(i4)

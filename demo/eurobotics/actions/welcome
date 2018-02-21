@@ -5,5 +5,5 @@ GESTURE
 <*,*,*,*>: animations/Stand/Gestures/Hey_1
 ----
 TTS
-<*,*,*,*>:"Welcome to the robotics week, this is a very long sentence, to test synchronization, of many events bla bla bla!"
+<*,*,*,*>:"Welcome to the Open DIAG!"
 ----
