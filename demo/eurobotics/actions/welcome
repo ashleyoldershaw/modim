@@ -1,3 +1,6 @@
 TEXT
 <*,*,*,*>:"Welcome to the robotics week"
 ----
+GESTURE
+<*,*,*,*>: animations/Stand/Gestures/Hey_1
+----

@@ -6,6 +6,7 @@ im = InteractionManager(None)
 im.setProfile(['*', '*', 'es', '*'])
 im.setPath('../../demo/eurobotics/')
 im.init()
+im.execute('welcome')
 im.execute('animal')
 
 

@@ -7,6 +7,7 @@ from actionReader import *
 from actionWriter import ActionWriter
 from profileMatcher import ProfileMatcher
 
+import threading
 
 class InteractionManager:
     def __init__(self, display):
@@ -28,6 +29,14 @@ class InteractionManager:
     def init(self):
         initFilename = os.path.join(self.path, "init")
         self.config = ActionReader(initFilename)
+
+        if "PROFILE" in self.config:
+            self.setProfile(parseProfile(self.config["PROFILE"]))
+
+        for key in self.config:
+            if key != "PROFILE" and key != "MULTILANG":
+                self.executeModality(key, self.config[key])
+                
         print self.config
         
     def execute(self, actionname):
@@ -36,14 +45,18 @@ class InteractionManager:
         action = ActionReader(actionFilename)
         pm = ProfileMatcher(action, self.profile)
 
+        threads = [] #for parallel execution of the modalities
         for key in action:
             if key == 'NAME':
                 continue
-            print key
             actual_interaction = pm.evalSection(key)
-            print actual_interaction
-            self.executeModality(key, actual_interaction)
-        
+            #self.executeModality(key, actual_interaction)
+            t = threading.Thread(target=self.executeModality, args=(key, actual_interaction))
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
 
     def ask(self, actionname):
         self.execute(actionname)
@@ -84,6 +97,8 @@ class InteractionManager:
 
         elif modality == 'GESTURE':
             print 'run_animation('+interaction+')'
+
+        print "Finished executeModality("+modality+","+str(interaction)+")\n"
 
 if __name__ == "__main__":
     pass
