@@ -128,14 +128,16 @@ class DisplayWS:
     def display_imagebuttons(self, data): 
         global last_answer, return_value
         for d in data:
-            self.websend("display_imagebutton_"+d)
+            self.websend("display_imagebutton_"+d+"\n")
+            time.sleep(0.1)
         last_answer = None
         return_value = "OK"
 
     def display_buttons(self, data): 
         global last_answer, return_value
         for d in data:
-            self.websend("display_button_"+d[0]+"_"+d[1])
+            self.websend("display_button_"+d[0]+"_"+d[1]+"\n")
+            time.sleep(0.1)
         last_answer = None
         return_value = "OK"
 

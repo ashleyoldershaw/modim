@@ -105,18 +105,6 @@ def i4():
     im.execute('goodbye')
 
 
-def i5():
 
-    #im.init()
-
-    time.sleep(3)
-
-    im.executeModality("TEXT",'Green')
-    im.executeModality("BUTTONS",[('green', 'img/cat.jpg'),('red','Red')])
-
-    time.sleep(3)
-    im.executeModality("TEXT",'')
-
-
-run_interaction(i1)
+run_interaction(i4)
 
