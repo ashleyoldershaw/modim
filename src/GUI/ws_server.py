@@ -61,6 +61,7 @@ def init_interaction_manager():
         if (robot_type=='pepper'):
             # Connection to robot
             robot = pepper_cmd.PepperRobot()
+            pepper_cmd.begin() # TODO remove after fixing all other functions using pepper_cmd
             if robot.connect():
                 robot_initialized = True
         elif (robot_type=='marrtino'):
