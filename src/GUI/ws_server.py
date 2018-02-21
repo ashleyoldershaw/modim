@@ -49,7 +49,7 @@ robot_initialized = False   # if robot has been initialized
 
 
 def init_interaction_manager():
-    global robot_type, robot_initialized, im, display_ws
+    global robot_type, robot_initialized, im, display_ws, robot
     print "Start interaction manager"
     print "  -- display init --"
     display_ws = DisplayWS()
@@ -61,7 +61,6 @@ def init_interaction_manager():
         if (robot_type=='pepper'):
             # Connection to robot
             robot = pepper_cmd.PepperRobot()
-            pepper_cmd.begin() # TODO remove after fixing all other functions using pepper_cmd
             if robot.connect():
                 robot_initialized = True
         elif (robot_type=='marrtino'):
@@ -71,10 +70,11 @@ def init_interaction_manager():
 
 
 def init_GUI(robot_type,url):
+    global robot
     # run in a separate thread (started before wssocket start, so it must wait before connection)
     time.sleep(3)
-    if (robot_type=='pepper' and url != None):
-        pepper_cmd.showurl(args.url)
+    if (robot_type=='pepper' and robot!=None and url!=None):
+        robot.showurl(url)
 
 
 
