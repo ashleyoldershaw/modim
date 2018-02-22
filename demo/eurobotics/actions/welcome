@@ -1,9 +1,13 @@
+IMAGE
+<*, *, *, *>:  "img/diag.png"
+----
 TEXT
-<*,*,*,*>:"Welcome to the robotics week"
+<*,*,*,*>:"Welcome to DIAG"
 ----
 GESTURE
-<*,*,*,*>: animations/Stand/Gestures/Hey_1
+#<*,*,*,*>: animations/Stand/Gestures/Hey_1
 ----
 TTS
-<*,*,*,*>:"Welcome to the Open DIAG!"
+#<*,*,it,*>:"Ciao! Benvenuto al Dipartimento DIAG!"
+#<*,*,*,*>:"Hello! Welcome to our Department!"
 ----

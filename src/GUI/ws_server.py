@@ -10,6 +10,7 @@ import random
 
 #from threading import Thread
 from thread2 import Thread
+from threading import Lock
 
 import tornado.httpserver
 import tornado.websocket
@@ -62,12 +63,13 @@ def init_interaction_manager():
     if (not robot_initialized): 
         if (robot_type=='pepper'):
             # Connection to robot
-            robot = pepper_cmd.PepperRobot()
-            if robot.connect():
+            pepper_cmd.robot = pepper_cmd.PepperRobot()
+            pepper_cmd.robot.connect()
+            if (pepper_cmd.robot.isConnected):
                 robot_initialized = True
         elif (robot_type=='marrtino'):
             pass  
-    im = interaction_manager.InteractionManager(display_ws, robot)
+    im = interaction_manager.InteractionManager(display_ws, pepper_cmd.robot)
 
 
 
@@ -97,6 +99,7 @@ class DisplayWS:
 
     def __init__(self):
         self.websocket_server = None
+        self.mutex = Lock()
 
     def setws(self, websocket_server):
         self.websocket_server = websocket_server
@@ -106,10 +109,13 @@ class DisplayWS:
             print('%sDisplayWS: websocket not connected.%s' %(RED,RESET))
             return
         try:
+            self.mutex.acquire()
             self.websocket_server.write_message(data)
             #print(status)
         except tornado.websocket.WebSocketClosedError:
             print('%sDisplayWS: websocket connection error.%s' %(RED,RESET))
+        finally:
+            self.mutex.release()
 
     def display_text(self, data, place):
         global return_value
@@ -129,7 +135,7 @@ class DisplayWS:
         global last_answer, return_value
         for d in data:
             self.websend("display_imagebutton_"+d+"\n")
-            time.sleep(0.1)
+            #time.sleep(0.01)
         last_answer = None
         return_value = "OK"
 
@@ -137,7 +143,7 @@ class DisplayWS:
         global last_answer, return_value
         for d in data:
             self.websend("display_button_"+d[0]+"_"+d[1]+"\n")
-            time.sleep(0.1)
+            #time.sleep(0.1)
         last_answer = None
         return_value = "OK"
 
@@ -175,18 +181,18 @@ class DisplayWS:
         return_value = "OK"
 
 
-def sensorvalue(data):
-    global return_value
-    val = None
-    print "Sensor ",data
-    if (data=='headtouch'):
-        val = pepper_cmd.headTouch
-    elif (data=='frontsonar'):
-        val = pepper_cmd.sonarValues[0]
-    elif (data=='backsonar'):
-        val = pepper_cmd.sonarValues[1]
-    print "Sensor value = ",val
-    return val
+#def sensorvalue(data):
+#    global return_value
+#    val = None
+#    print "Sensor ",data
+#    if (data=='headtouch'):
+#        val = pepper_cmd.headTouch
+#    elif (data=='frontsonar'):
+#        val = pepper_cmd.sonarValues[0]
+#    elif (data=='backsonar'):
+#        val = pepper_cmd.sonarValues[1]
+#    print "Sensor value = ",val
+#    return val
 
 
 def client_return():
@@ -286,7 +292,7 @@ def start_cmd_server(TCP_PORT):
             #conn.send("%s\n" %return_value)
 
         #TODO Only if not asked explict load URL        
-        #ifreset(True)
+        ifreset(True)
         if (conn_client is not None):
             conn_client.close()
             conn_client = None

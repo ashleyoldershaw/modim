@@ -9,9 +9,9 @@ from ws_client import *
 
 pepper_ip = '192.168.130.27' # wireless
 pepper_port = 9101
-setServerAddr(pepper_ip, pepper_port)
+#setServerAddr(pepper_ip, pepper_port)
 
-#setServerAddr('127.0.0.1', 9101)
+setServerAddr('127.0.0.1', 9101)
 
 def i1():
     begin()
@@ -84,26 +84,42 @@ def i4():
 
     im.setProfile(['*', '*', '*', '*'])
     im.setPath('../../demo/eurobotics/')
+
+    while True:
     
-    im.init()
+        im.init()
 
-    # event
-    time.sleep(5)
+        a = 1
+        while (a==0):
+            time.sleep(1)
+            a = sensorvalue('headtouch') + sensorvalue('lefthandtouch') +  sensorvalue('righthandtouch')
 
-    im.execute("welcome")
+        im.execute("welcome")
 
-    time.sleep(1)
+        time.sleep(1)
 
-    q = random.choice(['animal','color'])
+        q = random.choice(['animal','color'])
 
-    a = im.ask(q)
+        a = im.ask(q)
 
-    im.execute(a)
+        im.execute(a)
 
-    time.sleep(3)
+        time.sleep(3)
 
-    im.execute('goodbye')
+        im.execute('goodbye')
 
+
+def i5():
+    begin()
+    
+    a = sensorvalue('headtouch')
+    while (a!=1):
+        a = sensorvalue('headtouch')
+        time.sleep(1)
+
+    say('hello')
+    
+    end()
 
 
 run_interaction(i4)
