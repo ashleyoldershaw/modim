@@ -1,6 +1,9 @@
 TEXT
-<*,*,it,*>:"Che bello è quando il DIAG è pieno"
+<*,*,*,*>:"Che bello è quando il DIAG è pieno"
 ----
 GESTURE
 <*,*,*,*>: animations/Stand/Gestures/Enthusiastic_5
+----
+TTS
+<*,*,*,*>:"Che bello è quando il DIAG è pieno"
 ----

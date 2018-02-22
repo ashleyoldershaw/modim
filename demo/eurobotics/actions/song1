@@ -1,6 +1,9 @@
 TEXT
-<*,*,it,*>:"Quando un ro-bo può giocare insieme ad un pallone"
+<*,*,*,*>:"Quando un robot può giocare insieme ad un pallone"
 ----
 GESTURE
 <*,*,*,*>: animations/Stand/Emotions/Positive/Happy_4
+----
+TTS
+<*,*,*,*>:"Quando un ro bo può giocare insieme ad un pallone"
 ----

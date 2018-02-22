@@ -9,15 +9,15 @@ from ws_client import *
 
 pepper_ip = '192.168.130.27' # wireless
 pepper_port = 9101
-#setServerAddr(pepper_ip, pepper_port)
+setServerAddr(pepper_ip, pepper_port)
 
-setServerAddr('127.0.0.1', 9101)
+#setServerAddr('127.0.0.1', 9101)
 
 def i1():
     begin()
 
 
-    im.setProfile(['*', '*', 'it', '*'])
+    im.setProfile(['*', '*', '*', '*'])
     im.setPath('../../demo/eurobotics/')
 
     #showurl('demo/eurobotics/index.html')
@@ -121,6 +121,15 @@ def i5():
     
     end()
 
+def i6():
 
-run_interaction(i4)
+    im.setProfile(['*', '*', 'it', '*'])
+    im.setPath('../../demo/eurobotics/')
+
+    
+    im.execute('song1')
+    time.sleep(3)
+    im.execute('song2')        
+    
+run_interaction(i6)
 
