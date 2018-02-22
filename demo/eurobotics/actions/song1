@@ -7,3 +7,6 @@ GESTURE
 TTS
 <*,*,*,*>:"Quando un ro bo può giocare insieme ad un pallone"
 ----
+IMAGE
+<*,*,*,*>: img/diaglogo.jpg
+----

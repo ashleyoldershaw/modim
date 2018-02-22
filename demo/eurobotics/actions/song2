@@ -7,3 +7,6 @@ GESTURE
 TTS
 <*,*,*,*>:"Che bello è quando il DIAG è pieno"
 ----
+IMAGE
+<*,*,*,*>: img/diaglogo.jpg
+----
