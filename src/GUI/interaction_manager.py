@@ -9,6 +9,8 @@ from profileMatcher import ProfileMatcher
 
 import threading
 
+languages = {"en" : "English", "it": "Italian"}
+
 class InteractionManager:
     def __init__(self, display, robot):
         self.profile =  ['*', '*', '*', '*']
@@ -19,6 +21,8 @@ class InteractionManager:
         
     def setProfile(self, profile):
         self.profile = profile
+        print "Setting language to: ", languages[self.profile[2]]
+        self.robot.setLanguage(languages[self.profile[2]])
 
     def setPath(self, path):
         self.path = path
