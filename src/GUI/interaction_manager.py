@@ -21,8 +21,9 @@ class InteractionManager:
         
     def setProfile(self, profile):
         self.profile = profile
-        print "Setting language to: ", languages[self.profile[2]]
-        self.robot.setLanguage(languages[self.profile[2]])
+        if (self.robot!=None):
+            print "Setting language to: ", languages[self.profile[2]]
+            self.robot.setLanguage(languages[self.profile[2]])
 
     def setPath(self, path):
         self.path = path

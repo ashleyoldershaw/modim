@@ -67,9 +67,10 @@ def init_interaction_manager():
             pepper_cmd.robot.connect()
             if (pepper_cmd.robot.isConnected):
                 robot_initialized = True
+                robot = pepper_cmd.robot
         elif (robot_type=='marrtino'):
-            pass  
-    im = interaction_manager.InteractionManager(display_ws, pepper_cmd.robot)
+            pass
+    im = interaction_manager.InteractionManager(display_ws, robot)
 
 
 
@@ -261,7 +262,7 @@ def start_cmd_server(TCP_PORT):
         run=False        
     
     while run:
-        print "%sGUI Program Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET)
+        print("%sGUI Program Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET))
         connected = False
         conn_client = None
         try:
