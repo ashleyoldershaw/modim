@@ -31,6 +31,8 @@ function wsrobot_init(ip, port) {
               document.getElementById(v[1]+'_'+v[2]).innerHTML = v[3];
           else if (v[1]=='image')
               document.getElementById(v[1]+'_'+v[2]).src = v[3];
+          else if (v[1]=='pdf')
+              document.getElementById(v[1]+'_'+v[2]).src = v[3];
           else if (v[1]=='button') {
             var b = document.createElement("input");
             //Assign different attributes to the element. 

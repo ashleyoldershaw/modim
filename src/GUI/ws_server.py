@@ -132,6 +132,13 @@ class DisplayWS:
         self.websend(cmdsend)
         return_value = "OK"
 
+    def display_pdf(self, data, place='default'):
+        global return_value
+        cmdsend = "display_pdf_"+place+"_"+data
+        print "web send: " + cmdsend
+        self.websend(cmdsend)
+        return_value = "OK"
+
     def display_imagebuttons(self, data): 
         global last_answer, return_value
         for d in data:
@@ -161,6 +168,10 @@ class DisplayWS:
             #print "Answer: ",last_answer
         return_value = last_answer
         return return_value
+
+    def waitfor(self, data):
+        while (self.answer()!=data):
+            time.sleep(0.5)
 
     def cancel_answer(self):
         global reset_answer
@@ -214,8 +225,11 @@ def ifreset(killthread=False):
     time.sleep(0.5)
     client_return()
     if (killthread and code_running):
-        run_thread.terminate()
-        print "Run code thread: ",run_thread," terminated."
+        try:
+            run_thread.terminate()
+            print "Run code thread: ",run_thread," terminated."
+        except:
+            print "Thread already terminated"
         code_running = False
 
 
@@ -223,7 +237,7 @@ def ifreset(killthread=False):
 # Run the code
 
 def run_code(code):
-    global status, return_value, conn_client, im, code_running
+    global status, return_value, conn_client, im, code_running, last_answer
     if (code is None):
         return
     print("Executing")
