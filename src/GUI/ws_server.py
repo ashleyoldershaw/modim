@@ -39,7 +39,6 @@ code_running = False        # code running
 status = "Idle"             # robot status sent to websocket
 last_answer = None
 return_value = "OK"
-reset_answer = False        # Request to stop waiting for answers
 conn_client = None          # Connected client
 im = None                   # interaction manager
 display_ws = None           # display ws object
@@ -101,6 +100,7 @@ class DisplayWS:
     def __init__(self):
         self.websocket_server = None
         self.mutex = Lock()
+        self.reset_answer = False        # Request to stop waiting for answers
 
     def setws(self, websocket_server):
         self.websocket_server = websocket_server
@@ -161,21 +161,20 @@ class DisplayWS:
         return_value = "OK"
 
     def answer(self):
-        global last_answer, return_value, reset_answer
-        reset_answer = False
-        while (last_answer is None and not reset_answer):
+        global last_answer, return_value
+        self.reset_answer = False
+        while (last_answer is None and not self.reset_answer):
             time.sleep(0.5)
             #print "Answer: ",last_answer
         return_value = last_answer
         return return_value
 
     def waitfor(self, data):
-        while (self.answer()!=data):
+        while (self.answer()!=data and not self.reset_answer):
             time.sleep(0.5)
 
     def cancel_answer(self):
-        global reset_answer
-        reset_answer = True
+        self.reset_answer = True
 
     def ask(self, data):
         display_buttons(data)    
@@ -299,12 +298,14 @@ def start_cmd_server(TCP_PORT):
             if not data: break
             print "Received: ",data
 
-            if (data!='***STOP***'):
+            if (data[0]!='*'):
                 run_thread = Thread(target=run_code, args=(data,))
                 run_thread.start()
                 print "Thread started: ",run_thread
-            #run_code(data)
-            #conn.send("%s\n" %return_value)
+            else:
+                print "Control: ",data[1:]
+                global last_answer
+                last_answer = data[1:]
 
         #TODO Only if not asked explict load URL        
         ifreset(True)

@@ -45,6 +45,13 @@ def csendfile(program):
     print("Reply: %s" %rdata)
 
 
+def csend_noblock(data):
+    global csock
+    if csock==None:
+        cconnect()
+    csock.send(data)
+
+
 def csend(data):
     global csock
     if csock==None:
@@ -60,6 +67,8 @@ def csend(data):
         rdata = csock.recv(200)
     except KeyboardInterrupt:
         rdata = "user quit"
+    except socket.error:
+        rdata = "socket error"
     print "Reply: ",rdata
     return rdata
 
