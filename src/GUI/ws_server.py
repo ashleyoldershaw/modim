@@ -302,6 +302,8 @@ def start_cmd_server(TCP_PORT):
                 run_thread = Thread(target=run_code, args=(data,))
                 run_thread.start()
                 print "Thread started: ",run_thread
+            elif (data[0]!='['):
+                print "Values: ",data                
             else:
                 print "Control: ",data[1:]
                 global last_answer
