@@ -79,16 +79,27 @@ def cclose():
     csock = None
 
 
+code = ""
+
 def run_interaction(interaction):
+    global code
     lcode = inspect.getsourcelines(interaction)
-    code = ""
+    locode = ""
     for l in lcode[0][1:]:
-        code += l
-    code = textwrap.dedent(code)
+        locode += l
+    locode = textwrap.dedent(locode)
+    code += locode
     print code
     cconnect()
     csend(code)
 
+
+def store_interaction(interaction):
+    global code
+    lcode = inspect.getsourcelines(interaction)    
+    for l in lcode[0][0:]:
+        code += l
+    code += '\n'
 
 def main():
     parser = argparse.ArgumentParser()
