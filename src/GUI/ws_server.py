@@ -311,6 +311,8 @@ def start_cmd_server(TCP_PORT):
                     print "Cmd server: connection closed."
                     connected = False
                     break
+                if (d==''):
+                    break
                 data = data + d
                 print "Received partial data: ",data
 
