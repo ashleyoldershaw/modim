@@ -339,6 +339,7 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         last_answer = message
   
     def on_close(self):
+        global websocket_server
         print(RED+'Websocket: connection closed'+RESET)
         #TODO Only if not asked explict load URL 
         #ifreset(True)
@@ -362,6 +363,23 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
             print(RED+'Web socket: connection error.'+RESET)
 
 
+
+class CtrlWebSocketServer(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        print('New ctrl websocket connection')
+       
+    def on_message(self, message):
+        global last_answer
+        print('InCtrl input received:\n%s' % message)
+        last_answer = message
+  
+    def on_close(self):
+        print(RED+'Ctrl websocket: connection closed'+RESET)
+
+    def check_origin(self, origin):
+        #print("-- Request from %s" %(origin))
+        return True
 
 
 # Main program
@@ -419,6 +437,16 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(ws_server_port)
     print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
+
+    application2 = tornado.web.Application([
+        (r'/ctrlwebsocketserver', CtrlWebSocketServer),])  
+    ws_server2_port = ws_server_port + 10
+    http_server2 = tornado.httpserver.HTTPServer(application2)
+    http_server2.listen(ws_server2_port)
+    print("%sCtrl websocket server: listening on port %d %s" %(GREEN,ws_server2_port,RESET))
+
+
+
 
 
     # Init GUI
