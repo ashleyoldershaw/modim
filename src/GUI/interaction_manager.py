@@ -18,6 +18,7 @@ class InteractionManager:
         self.config = []
         self.display = display
         self.robot = robot
+        self.saytime = {}
         
     def setProfile(self, profile):
         self.profile = profile
@@ -74,6 +75,10 @@ class InteractionManager:
             return a
 
 
+    def encode(self, interaction):
+        l = min(10,len(interaction))
+        return interaction[0:l]
+
     def executeModality(self, modality, interaction):
         if modality.startswith('TEXT'):
             vmod = modality.split('_')
@@ -107,9 +112,12 @@ class InteractionManager:
                 self.robot.animation(interaction)
 
         elif modality == "TTS":
-            print 'say('+interaction+')'            
-            if (self.robot != None):
-                self.robot.say(interaction)
+            cod = self.encode(interaction)
+            if (not cod in self.saytime):
+                self.saytime[cod]=1
+                print 'say('+interaction+')'            
+                if (self.robot != None):
+                    self.robot.say(interaction)
 
         print "Finished executeModality("+modality+","+str(interaction)+")\n"
 
