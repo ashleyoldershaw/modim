@@ -45,10 +45,10 @@ display_ws = None           # display ws object
 robot_type = None           # None, pepper, marrtino, ...
 robot_initialized = False   # if robot has been initialized
 
+logfile = None              # log file
 
 
 # Settings functions
-
 
 def init_interaction_manager():
     global robot_type, robot_initialized, im, display_ws, robot
@@ -232,6 +232,18 @@ def ifreset(killthread=False):
         code_running = False
 
 
+# Log function
+
+def logdata(data):
+    global logfile
+    pass
+#    if (logfile == None):
+#        logfile = open('ws_server.log','a')
+#
+#    timestamp = time.now()
+#    logfile.write("%s;%r\n" %(timestamp, data))
+#    logfile.flush()
+
 
 # Run the code
 
@@ -289,25 +301,38 @@ def start_cmd_server(TCP_PORT):
             pass
         except:
             run = False
+
         while connected:
-            try:
-                data = conn_client.recv(BUFFER_SIZE)
-            except:
-                print "Cmd server: connection closed."
+            data = ''
+            while (connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
+                try:
+                    d = conn_client.recv(BUFFER_SIZE)
+                except:
+                    print "Cmd server: connection closed."
+                    connected = False
+                    break
+                if (d==''):
+                    break
+                data = data + d
+                print "Received partial data: ",data
+
+            if (not connected):
                 break
-            if not data: break
+            if (data==''):
+                break
+
             print "Received: ",data
 
-            if (data[0]!='*'):
-                run_thread = Thread(target=run_code, args=(data,))
-                run_thread.start()
-                print "Thread started: ",run_thread
-            elif (data[0]!='['):
-                print "Values: ",data                
-            else:
+            if (data[0]=='*'):
                 print "Control: ",data[1:]
                 global last_answer
                 last_answer = data[1:]
+            elif (data[0]=='['):
+                print "Values: ",data                
+            else:
+                run_thread = Thread(target=run_code, args=(data,))
+                run_thread.start()
+                print "Thread started: ",run_thread
 
         #TODO Only if not asked explict load URL        
         ifreset(True)
@@ -339,6 +364,7 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         last_answer = message
   
     def on_close(self):
+        global websocket_server
         print(RED+'Websocket: connection closed'+RESET)
         #TODO Only if not asked explict load URL 
         #ifreset(True)
@@ -362,6 +388,23 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
             print(RED+'Web socket: connection error.'+RESET)
 
 
+
+class CtrlWebSocketServer(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        print('New ctrl websocket connection')
+       
+    def on_message(self, message):
+        global last_answer
+        print('InCtrl input received:\n%s' % message)
+        last_answer = message
+  
+    def on_close(self):
+        print(RED+'Ctrl websocket: connection closed'+RESET)
+
+    def check_origin(self, origin):
+        #print("-- Request from %s" %(origin))
+        return True
 
 
 # Main program
@@ -420,6 +463,13 @@ if __name__ == "__main__":
     http_server.listen(ws_server_port)
     print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
 
+    application2 = tornado.web.Application([
+        (r'/ctrlwebsocketserver', CtrlWebSocketServer),])  
+    ws_server2_port = ws_server_port + 10
+    http_server2 = tornado.httpserver.HTTPServer(application2)
+    http_server2.listen(ws_server2_port)
+    print("%sCtrl websocket server: listening on port %d %s" %(GREEN,ws_server2_port,RESET))
+
 
     # Init GUI
     t_initgui = Thread(target=init_GUI, args=(robot_type, args.url,))
@@ -430,11 +480,15 @@ if __name__ == "__main__":
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         print(" -- Keyboard interrupt --")
-
     try:
         websocket_server.close()
     except:
         pass
+
+    global logfile
+    if (logfile != None):
+        logfile.close()
+
     print("Web server quit.")
     run = False
     print("Waiting for main loop to quit...")
