@@ -45,10 +45,10 @@ display_ws = None           # display ws object
 robot_type = None           # None, pepper, marrtino, ...
 robot_initialized = False   # if robot has been initialized
 
+logfile = None              # log file
 
 
 # Settings functions
-
 
 def init_interaction_manager():
     global robot_type, robot_initialized, im, display_ws, robot
@@ -231,6 +231,18 @@ def ifreset(killthread=False):
             print "Thread already terminated"
         code_running = False
 
+
+# Log function
+
+def logdata(data):
+    global logfile
+    pass
+#    if (logfile == None):
+#        logfile = open('ws_server.log','a')
+#
+#    timestamp = time.now()
+#    logfile.write("%s;%r\n" %(timestamp, data))
+#    logfile.flush()
 
 
 # Run the code
@@ -446,9 +458,6 @@ if __name__ == "__main__":
     print("%sCtrl websocket server: listening on port %d %s" %(GREEN,ws_server2_port,RESET))
 
 
-
-
-
     # Init GUI
     t_initgui = Thread(target=init_GUI, args=(robot_type, args.url,))
     t_initgui.start()
@@ -458,11 +467,15 @@ if __name__ == "__main__":
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         print(" -- Keyboard interrupt --")
-
     try:
         websocket_server.close()
     except:
         pass
+
+    global logfile
+    if (logfile != None):
+        logfile.close()
+
     print("Web server quit.")
     run = False
     print("Waiting for main loop to quit...")
