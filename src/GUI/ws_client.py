@@ -57,7 +57,7 @@ def csend(data):
     if csock==None:
         cconnect()
     print ("WS client:: sending data ...")
-    csock.send(data)
+    csock.send(data+"\n###ooo###\n\n")
     print ("WS client:: data sent")
 
     time.sleep(0.5)

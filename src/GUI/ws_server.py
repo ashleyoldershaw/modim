@@ -302,24 +302,32 @@ def start_cmd_server(TCP_PORT):
         except:
             run = False
         while connected:
-            try:
-                data = conn_client.recv(BUFFER_SIZE)
-            except:
-                print "Cmd server: connection closed."
+            data = ' '
+
+            while (data[0]!='*') and (data[0]!='[') and (not '###ooo###' in data):
+                try:
+                    d = conn_client.recv(BUFFER_SIZE)
+                except:
+                    print "Cmd server: connection closed."
+                    connected = False
+                    break
+                data = data + d
+
+            if (not connected):
                 break
-            if not data: break
+
             print "Received: ",data
 
-            if (data[0]!='*'):
-                run_thread = Thread(target=run_code, args=(data,))
-                run_thread.start()
-                print "Thread started: ",run_thread
-            elif (data[0]!='['):
-                print "Values: ",data                
-            else:
+            if (data[0]=='*'):
                 print "Control: ",data[1:]
                 global last_answer
                 last_answer = data[1:]
+            elif (data[0]=='['):
+                print "Values: ",data                
+            else:
+                run_thread = Thread(target=run_code, args=(data,))
+                run_thread.start()
+                print "Thread started: ",run_thread
 
         #TODO Only if not asked explict load URL        
         ifreset(True)
