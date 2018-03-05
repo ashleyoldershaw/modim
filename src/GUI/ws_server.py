@@ -301,10 +301,10 @@ def start_cmd_server(TCP_PORT):
             pass
         except:
             run = False
-        while connected:
-            data = ' '
 
-            while (data[0]!='*') and (data[0]!='[') and (not '###ooo###' in data):
+        while connected:
+            data = ''
+            while (connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
                 try:
                     d = conn_client.recv(BUFFER_SIZE)
                 except:
@@ -312,8 +312,11 @@ def start_cmd_server(TCP_PORT):
                     connected = False
                     break
                 data = data + d
+                print "Received partial data: ",data
 
             if (not connected):
+                break
+            if (data==''):
                 break
 
             print "Received: ",data
