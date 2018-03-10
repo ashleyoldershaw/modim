@@ -114,7 +114,7 @@ class InteractionManager:
         elif modality == "TTS":
             cod = self.encode(interaction)
             if (not cod in self.saytime):
-                self.saytime[cod]=1
+                #self.saytime[cod]=1
                 print 'say('+interaction+')'            
                 if (self.robot != None):
                     self.robot.say(interaction)
