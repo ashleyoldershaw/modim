@@ -163,9 +163,10 @@ class DisplayWS:
     def answer(self):
         global last_answer, return_value
         self.reset_answer = False
+        last_answer = None
         while (last_answer is None and not self.reset_answer):
             time.sleep(0.5)
-            #print "Answer: ",last_answer
+        print "Answer: ",last_answer
         return_value = last_answer
         return return_value
 
