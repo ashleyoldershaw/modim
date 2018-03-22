@@ -150,7 +150,8 @@ class DisplayWS:
     def display_buttons(self, data): 
         global last_answer, return_value
         for d in data:
-            self.websend("display_button_"+d[0]+"_"+d[1]+"\n")
+            print "WebSend: ", "display_button_"+d[0]+","+d[1]+"\n"
+            self.websend("display_button_"+d[0]+","+d[1]+"\n")
             #time.sleep(0.1)
         last_answer = None
         return_value = "OK"
@@ -208,11 +209,16 @@ class DisplayWS:
 
 
 def client_return():
-    global conn_client, return_value
+    global conn_client, return_value, last_answer
     if (conn_client is None):
         return
     try:
-        conn_client.send("%r\n" %return_value)
+        if (last_answer != None):
+            conn_client.send("%r\n" %last_answer)
+            last_answer = None
+        else:
+            conn_client.send("%r\n" %return_value)
+            
     except Exception as e:
         print(RED+"Run code: Connection error"+RESET)
         print e
@@ -302,6 +308,7 @@ def start_cmd_server(TCP_PORT):
             pass
         except:
             run = False
+
 
         while connected:
             data = ''

@@ -25,7 +25,7 @@ function wsrobot_init(ip, port) {
 
     websocket.onmessage = function(event){
       console.log("message received: "+event.data);
-      v = event.data.split('_');
+	v = event.data.split('_');
       if (v[0]=='display') {
           if (v[1]=='text')
               document.getElementById(v[1]+'_'+v[2]).innerHTML = v[3];
@@ -34,23 +34,29 @@ function wsrobot_init(ip, port) {
           else if (v[1]=='pdf')
               document.getElementById(v[1]+'_'+v[2]).src = v[3];
           else if (v[1]=='button') {
-            var b = document.createElement("input");
-            //Assign different attributes to the element. 
-
-            if (v[3].substr(0,3)=='img') {
-                b.type = "image";
-                b.src = v[3];
-            }
-            else {
-                b.type = "button";
-                b.value = v[3]; 
-            }
-
-            b.name = v[2]; 
-            b.id = v[2]; 
-            b.onclick = function(event) { button_fn(event) };
-            var bdiv = document.getElementById("buttons");
-            bdiv.appendChild(b);
+              var b = document.createElement("input");
+              //Assign different attributes to the element. 
+	      p = v[2] 
+	      for (i=3; i<v.length; i++){
+		  p = p + "_" + v[i];
+	      }
+	      console.log(p);
+	      vp = p.split(',');;
+	      
+              if (v[3].substr(0,3)=='img') {
+                  b.type = "image";
+                  b.src = vp[1];
+              }
+              else {
+                  b.type = "button";
+                  b.value = vp[1]; 
+              }
+	      
+              b.name = vp[0]; 
+              b.id = vp[0]; 
+              b.onclick = function(event) { button_fn(event) };
+              var bdiv = document.getElementById("buttons");
+              bdiv.appendChild(b);
           }
         }
         else if (v[0]=='remove') {
