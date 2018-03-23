@@ -30,9 +30,18 @@ function wsrobot_init(ip, port) {
 	if (v[0]=='display') {
             if (v[1]=='text')
 		document.getElementById(v[1]+'_'+v[2]).innerHTML = v[3];
-            else if (v[1]=='image')
-		document.getElementById(v[1]+'_'+v[2]).src = v[3];
-            else if (v[1]=='button') {
+            else if (v[1]=='image'){
+		p = v[3];
+		for (i=4; i<v.length; i++){
+		    p = p + "_" + v[i];
+		}
+
+		console.log("image: " + p);
+
+		
+		document.getElementById(v[1]+'_'+v[2]).src = p;
+	    }
+	    else if (v[1]=='button') {
 		var b = document.createElement("input");
 		//Assign different attributes to the element. 
 		p = v[2] 
