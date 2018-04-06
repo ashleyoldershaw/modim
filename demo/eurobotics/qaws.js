@@ -50,8 +50,8 @@ function wsrobot_init(ip, port) {
 		}
 		console.log(p);
 		vp = p.split(',');
-		
-		if (v[3].substr(0,3)=='img') {
+
+		if (vp[1].substr(0,3)=='img') {
                     b.type = "image";
                     b.src = vp[1];
 		}
