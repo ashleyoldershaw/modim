@@ -150,8 +150,8 @@ class DisplayWS:
     def display_buttons(self, data): 
         global last_answer, return_value
         for d in data:
-            print "WebSend: ", "display_button_"+d[0]+","+d[1]+"\n"
-            self.websend("display_button_"+d[0]+","+d[1]+"\n")
+            print "WebSend: ", "display_button_"+d[0]+"$"+d[1]+"\n"
+            self.websend("display_button_"+d[0]+"$"+d[1]+"\n")
             #time.sleep(0.1)
         last_answer = None
         return_value = "OK"
