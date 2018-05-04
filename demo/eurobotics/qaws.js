@@ -49,7 +49,7 @@ function wsrobot_init(ip, port) {
 		    p = p + "_" + v[i];
 		}
 		console.log(p);
-		vp = p.split(',');
+		vp = p.split('$');
 
 		if (vp[1].substr(0,3)=='img') {
                     b.type = "image";
