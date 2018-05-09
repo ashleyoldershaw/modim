@@ -57,6 +57,8 @@ class InteractionManager:
             if key == 'NAME':
                 continue
             actual_interaction = pm.evalSection(key)
+            if (len(actual_interaction) == 0):
+                continue
             #self.executeModality(key, actual_interaction)
             t = threading.Thread(target=self.executeModality, args=(key, actual_interaction))
             threads.append(t)
