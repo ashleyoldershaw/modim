@@ -1,7 +1,7 @@
 from interaction_manager import InteractionManager
 
 
-im = InteractionManager(None)
+im = InteractionManager(None, None)
 
 im.setProfile(['*', '*', 'es', '*'])
 im.setPath('../../demo/eurobotics/')
