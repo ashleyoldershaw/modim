@@ -2,16 +2,23 @@ import sys
 import time
 import os
 
-sys.path.append('../../src/GUI')
+try:
+    sys.path.insert(0, os.getenv('MODIM_HOME')+'/src/GUI')
+except Exception as e:
+    print "Please set MODIM_HOME environment variable to MODIM folder."
+    print e
+    sys.exit(1)
+
+import ws_client
 from ws_client import *
 
 #pepper_ip = '192.168.1.134' # ethernet
 
-pepper_ip = '192.168.130.27' # wireless
-pepper_port = 9101
-setServerAddr(pepper_ip, pepper_port)
+#pepper_ip = '192.168.130.27' # wireless
+#pepper_port = 9101
+#setServerAddr(pepper_ip, pepper_port)
 
-#setServerAddr('127.0.0.1', 9101)
+setServerAddr('127.0.0.1', 9101)
 
 def i1():
     begin()

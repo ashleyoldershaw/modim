@@ -97,7 +97,7 @@ class InteractionManager:
             if (len(vmod)>1):
                 place = vmod[1]
 
-            interaction =  os.path.join(self.path, interaction)
+            # interaction =  os.path.join(self.path, interaction)
             print 'display_image('+str(interaction)+','+place+')'
             if self.display != None:
                 self.display.display_image(interaction, place)
