@@ -32,7 +32,7 @@ import interaction_manager
 
 # Global variables
 
-websocket_server = None     # websocket handler
+modim_websocket_server = None     # modim websocket handler
 run = True                  # main_loop run flag
 run_thread = None           # thread running the code
 code_running = False        # code running
@@ -71,6 +71,11 @@ def init_interaction_manager():
             pass
     im = interaction_manager.InteractionManager(display_ws, robot)
 
+
+def quit_interaction_manager():
+    global robot
+    if (robot_type=='pepper'):
+        pepper_cmd.robot.quit()
 
 
 def init_GUI(robot_type,url):
@@ -274,6 +279,7 @@ def run_code(code):
     ifreset()
     print("=== End code run ===")
 
+
 # TCP command server
 
 def start_cmd_server(TCP_PORT):
@@ -284,39 +290,43 @@ def start_cmd_server(TCP_PORT):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    #s.settimeout(3)
+    s.settimeout(3)
     try:
         s.bind((TCP_IP,TCP_PORT))
         s.listen(1)
         run=True
     except:
-        print RED+"GUI Program Server: bind error"+RESET
+        print RED+"Cmd Server: bind error"+RESET
         run=False        
     
     while run:
-        print("%sGUI Program Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET))
+        print("%sCmd Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET))
         connected = False
         conn_client = None
-        try:
-            conn_client, addr = s.accept()
-            print "Connection address:", addr
-            connected = True
-        except KeyboardInterrupt:
-            print "User quit."
-            run = False
-        except socket.timeout:
-            pass
-        except:
-            run = False
+        
+        while (run and not connected):
+            try:
+                #print "GUI Waiting for connection ..."
+                conn_client, addr = s.accept()
+                print "Cmd Connection address:", addr
+                connected = True
+            except KeyboardInterrupt:
+                print "User quit."
+                run = False
+            except socket.timeout:
+                pass
+            except Excpetion as e:
+                print e
+                run = False
 
 
-        while connected:
+        while (run and connected):
             data = ''
-            while (connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
+            while (run and connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
                 try:
                     d = conn_client.recv(BUFFER_SIZE)
                 except:
-                    print "Cmd server: connection closed."
+                    print "Cmd Server: connection closed."
                     connected = False
                     break
                 if (d==''):
@@ -342,27 +352,29 @@ def start_cmd_server(TCP_PORT):
                 run_thread.start()
                 print "Thread started: ",run_thread
 
-        #TODO Only if not asked explict load URL        
-        ifreset(True)
-        if (conn_client is not None):
-            conn_client.close()
-            conn_client = None
-        print "Cmd server: end connection"
+
+    #TODO Only if not asked explict load URL        
+    ifreset(True)
+
+    if (conn_client is not None):
+        conn_client.close()
+        conn_client = None
+    print "Cmd Server: quit"
         
  
 
 
 
-# Websocket server handler
+# Modim Websocket server handler
 
-class MyWebSocketServer(tornado.websocket.WebSocketHandler):
+class ModimWebSocketServer(tornado.websocket.WebSocketHandler):
 
     def open(self):
-        global websocket_server, display_ws
-        websocket_server = self
-        print('New websocket connection')
-        print websocket_server
-        display_ws.setws(websocket_server)
+        global modim_websocket_server, display_ws
+        modim_websocket_server = self
+        print('New modim websocket connection')
+        print modim_websocket_server
+        display_ws.setws(modim_websocket_server)
        
     def on_message(self, message):
         global last_answer
@@ -372,11 +384,11 @@ class MyWebSocketServer(tornado.websocket.WebSocketHandler):
         last_answer = message
   
     def on_close(self):
-        global websocket_server
-        print(RED+'Websocket: connection closed'+RESET)
+        global modim_websocket_server
+        print(RED+'Modim Websocket: connection closed'+RESET)
         #TODO Only if not asked explict load URL 
         #ifreset(True)
-        websocket_server = None
+        modim_websocket_server = None
   
     def on_ping(self, data):
         print('ping received: %s' %(data))
@@ -415,13 +427,51 @@ class CtrlWebSocketServer(tornado.websocket.WebSocketHandler):
         return True
 
 
+# Code Websocket server handler
+
+class CodeWebSocketServer(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        print('New Code connection')
+       
+    def on_message(self, message):
+        global code, status, robot
+        if (message=='stop'):
+            print('Stop code and robot')
+            robot.stop_request = True
+            robot.stop()
+        else:
+            print('Code received:\n%s' % message)
+            if (status=='Idle'):
+                t = Thread(target=run_code, args=(message,))
+                t.start()
+            else:
+                print('Program running. This code is discarded.')
+        self.write_message('OK')
+  
+    def on_close(self):
+        print('Code Connection closed')
+  
+    def on_ping(self, data):
+        print('ping received: %s' %(data))
+  
+    def on_pong(self, data):
+        print('pong received: %s' %(data))
+  
+    def check_origin(self, origin):
+        #print("-- Request from %s" %(origin))
+        return True
+
+
 # Main program
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-wsport", type=str, default=9100,
-                        help="WS Server port.")
+    parser.add_argument("-modimwsport", type=str, default=9100,
+                        help="MODIM WS Server port.")
+    parser.add_argument("-codewsport", type=str, default=9010,
+                        help="Code WS Server port.")
     parser.add_argument("-cmdport", type=int, default=9101,
                         help="Command Server port")
     parser.add_argument("-robot", type=str, default=None,
@@ -431,7 +481,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ws_server_port = args.wsport
+    modim_ws_server_port = args.modimwsport
+    code_ws_server_port = args.codewsport
     cmd_server_port = args.cmdport
     robot_type = args.robot
 
@@ -465,18 +516,24 @@ if __name__ == "__main__":
     init_interaction_manager()
 
     # Run websocket server
-    application = tornado.web.Application([
-        (r'/websocketserver', MyWebSocketServer),])  
-    http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(ws_server_port)
-    print("%sWebsocket server: listening on port %d %s" %(GREEN,ws_server_port,RESET))
+    application1 = tornado.web.Application([
+        (r'/modimwebsocketserver', ModimWebSocketServer),])  
+    http_server = tornado.httpserver.HTTPServer(application1)
+    http_server.listen(modim_ws_server_port)
+    print("%sModim Websocket server: listening on port %d %s" %(GREEN,modim_ws_server_port,RESET))
 
     application2 = tornado.web.Application([
         (r'/ctrlwebsocketserver', CtrlWebSocketServer),])  
-    ws_server2_port = ws_server_port + 10
+    ctrl_ws_server_port = modim_ws_server_port + 10
     http_server2 = tornado.httpserver.HTTPServer(application2)
-    http_server2.listen(ws_server2_port)
-    print("%sCtrl websocket server: listening on port %d %s" %(GREEN,ws_server2_port,RESET))
+    http_server2.listen(ctrl_ws_server_port)
+    print("%sCtrl websocket server: listening on port %d %s" %(GREEN,ctrl_ws_server_port,RESET))
+
+    application3 = tornado.web.Application([
+        (r'/websocketserver', CodeWebSocketServer),])  
+    http_server = tornado.httpserver.HTTPServer(application3)
+    http_server.listen(code_ws_server_port)
+    print("%sCode Websocket server: listening on port %d %s" %(GREEN,code_ws_server_port,RESET))
 
 
     # Init GUI
@@ -489,7 +546,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print(" -- Keyboard interrupt --")
     try:
-        websocket_server.close()
+        modim_websocket_server.close()
     except:
         pass
 
@@ -499,6 +556,10 @@ if __name__ == "__main__":
 
     print("Web server quit.")
     run = False
+
+    quit_interaction_manager()
+
     print("Waiting for main loop to quit...")
 
+    sys.exit(0)
 
