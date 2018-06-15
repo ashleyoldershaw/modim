@@ -33,6 +33,10 @@ class InteractionManager:
         actionFullPath = os.path.join(self.path, "actions/"+actionname)
         return actionFullPath
 
+    def getGrammarFilename(self, grammarname):
+        grammarFullPath = os.path.join(self.path, "grammars/"+grammarname)
+        return grammarFullPath
+    
     def init(self):
         initFilename = os.path.join(self.path, "init")
         self.config = ActionReader(initFilename)
@@ -117,7 +121,26 @@ class InteractionManager:
                 self.display.display_buttons(interaction)
 
         elif modality == 'ASRCMD':
-            print 'send_command_speech('+interaction+')'
+            grammarFilename = self.getGrammarFilename(interaction)
+            print grammarFilename
+            grammarFile = open(grammarFilename, 'rU')
+            inv_grammar = dict()
+            grammar = dict()
+            vocabulary = []
+            for line in grammarFile.readlines():
+                print line
+                s = line.split('->')
+                words = s[0].strip().split(',')
+                words = map(str.strip, words) #removes spaces on all elements
+                key = s[1].strip()
+                grammar[key] = words
+
+                vocabulary.extend(words)
+                for w in words:
+                    inv_grammar[w] = key
+
+            self.robot.asr(vocabulary)
+                        
 
         elif modality == 'GESTURE':
             print 'run_animation('+interaction+')'
