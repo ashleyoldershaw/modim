@@ -23,6 +23,23 @@ class ProfileMatcher():
             return finalButtons
         else:
             return self.look_for_best_rule(self.action[sectionType])
+
+    def listConditions(self):
+        conds = []
+        if 'BUTTONS' in self.action:
+            buttonsList = self.action["BUTTONS"]
+            for button in buttonsList:
+                buttonRules = button[1]
+                best = self.look_for_best_rule(buttonRules)
+                conds.append(button[0])
+        # TODO        
+        #if ('ASRCMD' in self.action):
+        #    asrList = self.action["ASRCMD"]
+        #    for asr in asrList:
+        #        asrRules = asr[1]
+        #        best = self.look_for_best_rule(asrRules)
+        #        conds.append(asr[0])
+        return conds
         
     def look_for_best_rule(self, ruleList):
         #look for more suitable rule

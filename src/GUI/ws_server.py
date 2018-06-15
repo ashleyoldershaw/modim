@@ -176,6 +176,10 @@ class DisplayWS:
         return_value = last_answer
         return return_value
 
+    def setReturnValue(self, rv): # value returned to the client when remote program finishes
+        global return_value
+        return_value = rv
+
     def waitfor(self, data):
         while (self.answer()!=data and not self.reset_answer):
             time.sleep(0.5)
@@ -219,10 +223,10 @@ def client_return():
         return
     try:
         if (last_answer != None):
-            conn_client.send("%r\n" %last_answer)
+            conn_client.send("%s\n" %last_answer)
             last_answer = None
         else:
-            conn_client.send("%r\n" %return_value)
+            conn_client.send("%s\n" %return_value)
             
     except Exception as e:
         print(RED+"Run code: Connection error"+RESET)

@@ -45,6 +45,15 @@ class InteractionManager:
                 self.executeModality(key, self.config[key])
                 
         print self.config
+
+    # returns the list of conditions in an action
+    def listConditions(self, actionname):
+        actionFilename = self.getActionFilename(actionname)
+        action = ActionReader(actionFilename)
+        pm = ProfileMatcher(action, self.profile)
+        r = pm.listConditions()
+        self.display.setReturnValue(r)
+        return r         
         
     def execute(self, actionname):
         actionFilename = self.getActionFilename(actionname)

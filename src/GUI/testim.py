@@ -9,6 +9,7 @@ im.init()
 im.execute('welcome')
 im.execute('animal')
 
+print im.listConditions('animal')
 
 #im.setPath('../../demo/facultywelcomedaynew/')
 #im.execute('welcome')
