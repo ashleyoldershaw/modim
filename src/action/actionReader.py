@@ -1,4 +1,5 @@
 import os
+import urllib2
 
 def parseProfile(profile):
     parsedProfile = profile.lstrip('<').rstrip('> ')
@@ -11,24 +12,33 @@ def parseContent(content):
     return parsedContent
 
 class ActionReader(dict):
-    def __init__(self, actionFilename):
+    def __init__(self, actionFilename, demoIP='127.0.0.1', demoPort=8000):
         self.actionFile = []
-        
+        self.actionFile = None
+        # open action file from file system        
         try:
-            print 'openning ', actionFilename
+            print 'openning file', actionFilename
             self.actionFile = open(actionFilename, 'rU')
-            
         except IOError:
-            print 'cannot open', actionFilename
-            return None
+            print 'cannot open file', actionFilename
 
-        #initializing action
-        self['NAME'] = os.path.basename(actionFilename)
+        if self.actionFile==None:
+            # open action file from web server
+            try:
+                url = 'http://%s:%d/actions/%s' %(demoIP,demoPort,os.path.basename(actionFilename))
+                print 'openning url', url
+                self.actionFile = urllib2.urlopen(url)
+                
+            except IOError:
+                print 'cannot open URL', url
 
-        if self['NAME'] == 'init':
-            self.parseInitActionFile()
-        else:
-            self.parseActionFile()
+        if self.actionFile!=None:
+            #initializing action
+            self['NAME'] = os.path.basename(actionFilename)
+            if self['NAME'] == 'init':
+                self.parseInitActionFile()
+            else:
+                self.parseActionFile()
 
     def parseActionFile(self):
         sectionRules = []

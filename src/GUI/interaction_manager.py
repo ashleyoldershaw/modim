@@ -11,6 +11,13 @@ import threading
 
 languages = {"en" : "English", "it": "Italian"}
 
+
+def printError(message):
+    RED   = "\033[1;31m"  
+    RESET = "\033[0;0m"
+    print("%s%s%s" %(RED,message,RESET))
+
+
 class InteractionManager:
     def __init__(self, display, robot):
         self.profile =  ['*', '*', '*', '*']
@@ -19,7 +26,9 @@ class InteractionManager:
         self.display = display
         self.robot = robot
         self.saytime = {}
-        
+        self.demoIP = '127.0.0.1' # web server containing the demo
+        self.demoPort = 8000      # web server containing the demo
+
     def setProfile(self, profile):
         self.profile = profile
         if (self.robot!=None):
@@ -29,6 +38,10 @@ class InteractionManager:
     def setPath(self, path):
         self.path = path
 
+    def setDemoServer(self, demoIP, demoPort):
+        self.demoIP = demoIP
+        self.demoPort = demoPort
+
     def getActionFilename(self, actionname):
         actionFullPath = os.path.join(self.path, "actions/"+actionname)
         return actionFullPath
@@ -37,9 +50,13 @@ class InteractionManager:
         grammarFullPath = os.path.join(self.path, "grammars/"+grammarname)
         return grammarFullPath
     
+    def getGrammarURL(self, grammarname):
+        url = 'http://%s:%d/grammars/%s' %(self.demoIP,self.demoPort,grammarname)
+        return url
+
     def init(self):
         initFilename = os.path.join(self.path, "init")
-        self.config = ActionReader(initFilename)
+        self.config = ActionReader(initFilename, self.demoIP, self.demoPort)
 
         if "PROFILE" in self.config:
             self.setProfile(parseProfile(self.config["PROFILE"]))
@@ -53,7 +70,7 @@ class InteractionManager:
     # returns the list of conditions in an action
     def listConditions(self, actionname):
         actionFilename = self.getActionFilename(actionname)
-        action = ActionReader(actionFilename)
+        action = ActionReader(actionFilename, self.demoIP, self.demoPort)
         pm = ProfileMatcher(action, self.profile)
         r = pm.listConditions()
         self.display.setReturnValue(r)
@@ -61,8 +78,7 @@ class InteractionManager:
         
     def execute(self, actionname):
         actionFilename = self.getActionFilename(actionname)
-
-        action = ActionReader(actionFilename)
+        action = ActionReader(actionFilename, self.demoIP, self.demoPort)
         pm = ProfileMatcher(action, self.profile)
 
         threads = [] #for parallel execution of the modalities
@@ -121,25 +137,47 @@ class InteractionManager:
                 self.display.display_buttons(interaction)
 
         elif modality == 'ASRCMD':
-            grammarFilename = self.getGrammarFilename(interaction)
-            print grammarFilename
-            grammarFile = open(grammarFilename, 'rU')
+            grammarFile = None
+            # try reading from file
+            try:
+                grammarFilename = self.getGrammarFilename(interaction)
+                print 'Reading grammar file', grammarFilename
+                grammarFile = open(grammarFilename, 'rU')
+            except IOError:
+                print "Cannot open grammar file", grammarFile
+
+            if grammarFile==None:
+                # try reading from URL
+                try:
+                    grammarURL = self.getGrammarURL(interaction)
+                    print 'Reading grammar URL ', grammarURL
+                    grammarFile = urllib2.urlopen(grammarURL)
+                except:
+                    print "Cannot open grammar URL", grammarURL
+
+
+            if grammarFile==None:
+                return
+
             inv_grammar = dict()
             grammar = dict()
             vocabulary = []
             for line in grammarFile.readlines():
-                print line
-                s = line.split('->')
-                words = s[0].strip().split(',')
-                words = map(str.strip, words) #removes spaces on all elements
-                key = s[1].strip()
-                grammar[key] = words
+                print 'grammar file: ',line
+                try:
+                    s = line.split('->')
+                    words = s[0].strip().split(',')
+                    words = map(str.strip, words) #removes spaces on all elements
+                    key = s[1].strip()
+                    grammar[key] = words
+                    vocabulary.extend(words)
+                    for w in words:
+                        inv_grammar[w] = key
+                except:
+                    printError("Error in reading grammar file")
 
-                vocabulary.extend(words)
-                for w in words:
-                    inv_grammar[w] = key
-
-            self.robot.asr(vocabulary)
+            if (self.robot!=None):
+                self.robot.asr(vocabulary) # TODO check
                         
 
         elif modality == 'GESTURE':

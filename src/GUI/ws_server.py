@@ -336,14 +336,14 @@ def start_cmd_server(TCP_PORT):
                 if (d==''):
                     break
                 data = data + d
-                print "Received partial data: ",data
+                #print "Received partial data: ",data
 
             if (not connected):
                 break
             if (data==''):
                 break
 
-            print "Received: ",data
+            #print "Received: ",data
 
             if (data[0]=='*'):
                 print "Control: ",data[1:]
