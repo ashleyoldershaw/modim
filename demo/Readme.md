@@ -3,6 +3,7 @@
 This folder contains an example of a demo.
 
 A demo must contain the following elements:
+
 * `init`: file describing the default GUI configuration when the robot is not interacting with a person.
 * `lang_instance`: file describing the possible languages available for the demo. Images of the flags must be included in the img folder.
 * `index.html` (+ possible other HTML files): layout files
