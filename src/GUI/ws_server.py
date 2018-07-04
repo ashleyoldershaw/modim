@@ -223,10 +223,10 @@ def client_return():
         return
     try:
         if (last_answer != None):
-            conn_client.send("%s\n" %last_answer)
+            conn_client.send("%s\n" %repr(last_answer))
             last_answer = None
         else:
-            conn_client.send("%s\n" %return_value)
+            conn_client.send("%s\n" %repr(return_value))
             
     except Exception as e:
         print(RED+"Run code: Connection error"+RESET)
