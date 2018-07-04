@@ -25,7 +25,6 @@ def i2():
     begin()
 
     im.setProfile(['*', '*', 'it', '*'])
-    im.setPath('../../demo/eurobotics/')
 
     im.execute('welcome')
 
@@ -60,7 +59,6 @@ def itest():
 def i4():
 
     im.setProfile(['*', '*', '*', '*'])
-    im.setPath('../../demo/eurobotics/')
 
     while True:
     
