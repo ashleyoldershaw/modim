@@ -1,5 +1,6 @@
 import os
 import urllib2
+import rospy
 
 def parseProfile(profile):
     parsedProfile = profile.lstrip('<').rstrip('> ')
@@ -17,7 +18,7 @@ class ActionReader(dict):
         self.actionFile = None
         # open action file from file system        
         try:
-            print 'openning file', actionFilename
+            print 'opening file', actionFilename
             self.actionFile = open(actionFilename, 'rU')
         except IOError:
             print 'cannot open file', actionFilename
@@ -41,10 +42,17 @@ class ActionReader(dict):
                 self.parseActionFile()
 
     def parseActionFile(self):
+        modimVariables = {
+            "CHECKPOINT":"/diago_0/pnp/checkpoint",
+            "INTENDED ACTION":"/diago_0/pnp/currentTask"
+        }
         sectionRules = []
         sectionType = []
         for line in self.actionFile.readlines():
             line = line.replace("\"","").strip(" \t\n")
+            for item in modimVariables:
+                line = line.replace("#"+item+"#", rospy.get_param(modimVariables[item]).replace("_"," "))
+            print (line)
             if len(line) > 0 and line[0] != '#': #comment or empty line
                 if (line.startswith("TEXT") or
                     line.startswith("IMAGE") or
