@@ -89,11 +89,12 @@ class ModimWSClient:
         print ("WS client:: waiting for reply ...")
         try:
             rdata = self.csock.recv(self.BUFFER_SIZE)
+            rdata = rdata.strip()
         except KeyboardInterrupt:
             rdata = "user quit"
         except socket.error:
             rdata = "socket error"
-        print "Reply: ",rdata
+        print "Reply: (%s)"%rdata
         return rdata
 
     def cclose(self):

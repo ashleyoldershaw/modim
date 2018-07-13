@@ -188,6 +188,7 @@ class DisplayWS:
         self.reset_answer = True
 
     def ask(self, data):
+        remove_buttons()
         display_buttons(data)    
         a = answer()
         remove_buttons()
@@ -200,6 +201,7 @@ class DisplayWS:
         cmdsend = "url_"+data
         print "web send: " + cmdsend
         self.websend(cmdsend)
+        time.sleep(0.5)
         return_value = "OK"
 
 
@@ -223,10 +225,10 @@ def client_return():
         return
     try:
         if (last_answer != None):
-            conn_client.send("%s\n" %repr(last_answer))
+            conn_client.send("%s\n" %last_answer)
             last_answer = None
         else:
-            conn_client.send("%s\n" %repr(return_value))
+            conn_client.send("%s\n" %return_value)
             
     except Exception as e:
         print(RED+"Run code: Connection error"+RESET)
@@ -287,7 +289,7 @@ def run_code(code):
 # TCP command server
 
 def start_cmd_server(TCP_PORT):
-    global run, return_value, run_thread, conn_client
+    global run, return_value, run_thread, conn_client, code_running
 
     TCP_IP = ''
     BUFFER_SIZE = 20000
@@ -304,7 +306,14 @@ def start_cmd_server(TCP_PORT):
         run=False        
     
     while run:
+
+        if (code_running):
+            print("%s== Code running: %r ==%s" %(RED,code_running,RESET))
+            print("%s== Killing thread !!! ==%s" %(RED,RESET))
+            ifreset(True)
+
         print("%sCmd Server: listening on port %d %s" %(GREEN,TCP_PORT,RESET))
+
         connected = False
         conn_client = None
         
@@ -355,6 +364,7 @@ def start_cmd_server(TCP_PORT):
                 run_thread = Thread(target=run_code, args=(data,))
                 run_thread.start()
                 print "Thread started: ",run_thread
+
 
 
     #TODO Only if not asked explict load URL        
