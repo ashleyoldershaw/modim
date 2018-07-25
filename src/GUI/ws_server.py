@@ -7,6 +7,7 @@ import time
 import os
 import argparse
 import random
+import modimParameterServer as mps
 
 #from threading import Thread
 from thread2 import Thread
@@ -335,7 +336,7 @@ def start_cmd_server(TCP_PORT):
 
         while (run and connected):
             data = ''
-            while (run and connected and ((data=='') or (data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
+            while (run and connected and ((data=='') or (data[0]!='!' and data[0]!='*' and data[0]!='[' and (not '###ooo###' in data)))):
                 try:
                     d = conn_client.recv(BUFFER_SIZE)
                 except:
@@ -352,14 +353,21 @@ def start_cmd_server(TCP_PORT):
             if (data==''):
                 break
 
-            #print "Received: ",data
+            print "Received: ",data
 
             if (data[0]=='*'):
                 print "Control: ",data[1:]
                 global last_answer
                 last_answer = data[1:]
             elif (data[0]=='['):
-                print "Values: ",data                
+                print "Values: ",data   
+            elif (data[0]=='!'):
+                # parameter message should come in in the form of "! key ! value"
+                message=data[1:]
+                print "From PNP: ",message
+                arguments = message.split("!")
+                mps.setparam(arguments[0].strip(), arguments[1].strip())
+                             
             else:
                 run_thread = Thread(target=run_code, args=(data,))
                 run_thread.start()
