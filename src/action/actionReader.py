@@ -1,6 +1,6 @@
 import os
 import urllib2
-import rospy
+import modimParameterServer as mps
 
 def parseProfile(profile):
     parsedProfile = profile.lstrip('<').rstrip('> ')
@@ -42,16 +42,19 @@ class ActionReader(dict):
                 self.parseActionFile()
 
     def parseActionFile(self):
-        modimVariables = {
-            "CHECKPOINT":"/diago_0/pnp/checkpoint",
-            "INTENDED ACTION":"/diago_0/pnp/currentTask"
-        }
+        print "Parsing action file"
+        modimVariables = [
+            "CHECKPOINT",
+            "INTENDED ACTION"
+        ]
         sectionRules = []
         sectionType = []
         for line in self.actionFile.readlines():
             line = line.replace("\"","").strip(" \t\n")
+            print line
             for item in modimVariables:
-                line = line.replace("#"+item+"#", rospy.get_param(modimVariables[item]).replace("_"," "))
+                if mps.getparam(item) != None:
+                    line = line.replace("#"+item+"#", mps.getparam(item).replace("_"," "))
             print (line)
             if len(line) > 0 and line[0] != '#': #comment or empty line
                 if (line.startswith("TEXT") or
